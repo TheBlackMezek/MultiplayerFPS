@@ -28,16 +28,22 @@ public class PlayerController : NetworkBehaviour {
 
     public float moveSpeed = 1.0f;
     public float mouseSensitivity = 10.0f;
+    public float maxHp = 100.0f;
+    public float bulletSpeed = 10.0f;
 
     public Camera cam;
     public AudioListener ls;
     public CharacterController cc;
+    public GameObject bulletPrefab;
 
     private PlayerState lastVerifiedState;
     private List<PlayerInput> inputs = new List<PlayerInput>();
     private List<InputPacket> packets = new List<InputPacket>();
     private int inputId = 0;
     private int inputIdMax = 10000;
+
+    [SyncVar]
+    private float hp;
 
 
 
@@ -46,6 +52,8 @@ public class PlayerController : NetworkBehaviour {
         lastVerifiedState.id = 0;
         lastVerifiedState.position = transform.position;
         lastVerifiedState.euler = transform.eulerAngles;
+
+        hp = maxHp;
 
         if(!isLocalPlayer)
         {
@@ -67,14 +75,6 @@ public class PlayerController : NetworkBehaviour {
 
         PlayerInput input;
 
-        //input.id = inputId;
-
-        //++inputId;
-        //if(inputId > inputIdMax)
-        //{
-        //    inputId = 0;
-        //}
-
         float x = Input.GetAxisRaw("Horizontal") * Time.deltaTime * moveSpeed;
         float z = Input.GetAxisRaw("Vertical") * Time.deltaTime * moveSpeed;
         Vector3 move = transform.right * x + transform.forward * z;
@@ -87,19 +87,29 @@ public class PlayerController : NetworkBehaviour {
         input.rotation = turn;
 
         ProcessInput(input);
-
+        
         inputs.Add(input);
+
+        if(Input.GetMouseButtonDown(0))
+        {
+            CmdShoot();
+        }
     }
 
     private void FixedUpdate()
     {
-        if(!isLocalPlayer)
+        if(!isLocalPlayer || inputs.Count <= 0)
         {
             return;
         }
 
-        if(inputs.Count <= 0)
+        if(isServer)
         {
+            PlayerState state;
+            state.id = inputId;
+            state.position = transform.position;
+            state.euler = transform.eulerAngles;
+            RpcVerifyState(state);
             return;
         }
 
@@ -159,6 +169,10 @@ public class PlayerController : NetworkBehaviour {
     [ClientRpc]
     public void RpcVerifyState(PlayerState state)
     {
+        if(isServer)
+        {
+            return;
+        }
         lastVerifiedState = state;
 
         transform.position = lastVerifiedState.position;
@@ -178,6 +192,36 @@ public class PlayerController : NetworkBehaviour {
             ProcessInputPacket(p);
         }
 
+    }
+
+    [Command]
+    public void CmdShoot()
+    {
+        GameObject b = Instantiate(bulletPrefab);
+        b.transform.position = transform.position + transform.forward * 2;
+        b.transform.eulerAngles = transform.eulerAngles;
+        Rigidbody bbody = b.GetComponent<Rigidbody>();
+        bbody.AddForce(transform.forward * bulletSpeed, ForceMode.Impulse);
+
+        NetworkServer.Spawn(b);
+    }
+
+    [Command]
+    public void CmdDamage(float amt)
+    {
+        hp -= amt;
+        
+        if(hp <= 0)
+        {
+            CmdKill();
+        }
+    }
+
+    [Command]
+    public void CmdKill()
+    {
+        hp = maxHp;
+        transform.position = new Vector3(0, 10, 0);
     }
 
 }

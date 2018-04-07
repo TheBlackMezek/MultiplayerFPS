@@ -27,7 +27,7 @@ GameObject:
   - component: {fileID: 143736471763792738}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -57,7 +57,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1608432304391860}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.518164, y: -0.52175856, z: -1.216948}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4143814738205962}
@@ -108,11 +108,11 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+  m_StereoMirrorMode: 0
 --- !u!23 &23303973851734072
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -122,7 +122,6 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -138,7 +137,6 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -174,9 +172,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 200
   mouseSensitivity: 200
+  maxHp: 100
+  bulletSpeed: 10
   cam: {fileID: 20957832515418750}
   ls: {fileID: 81015119111135180}
   cc: {fileID: 143736471763792738}
+  bulletPrefab: {fileID: 1366473628281938, guid: 5ea6c40caa1af484b8dc8b8e7b752044,
+    type: 2}
 --- !u!114 &114633008632428854
 MonoBehaviour:
   m_ObjectHideFlags: 1
