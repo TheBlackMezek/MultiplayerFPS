@@ -30,6 +30,8 @@ public class PlayerController : NetworkBehaviour {
     public float mouseSensitivity = 10.0f;
     public float maxHp = 100.0f;
     public float bulletSpeed = 10.0f;
+    public float jumpForce = 100.0f;
+    public float gravForce = 15.0f;
 
     public Camera cam;
     public AudioListener ls;
@@ -41,6 +43,7 @@ public class PlayerController : NetworkBehaviour {
     private List<InputPacket> packets = new List<InputPacket>();
     private int inputId = 0;
     private int inputIdMax = 10000;
+    private float yVel = 0;
 
     [SyncVar]
     private float hp;
@@ -74,11 +77,26 @@ public class PlayerController : NetworkBehaviour {
             return;
         }
 
+        if(!cc.isGrounded)
+        {
+            yVel -= Time.deltaTime * gravForce;
+        }
+        else
+        {
+            yVel = 0;
+        }
+
         PlayerInput input;
 
         float x = Input.GetAxisRaw("Horizontal") * Time.deltaTime * moveSpeed;
         float z = Input.GetAxisRaw("Vertical") * Time.deltaTime * moveSpeed;
         Vector3 move = transform.right * x + transform.forward * z;
+
+        if(Input.GetAxisRaw("Jump") > 0 && cc.isGrounded)
+        {
+            yVel = jumpForce;
+        }
+        move += Vector3.up * Time.deltaTime * yVel;
 
         float yaw = Input.GetAxis("Mouse X") * Time.deltaTime * mouseSensitivity;
         float pitch = -Input.GetAxis("Mouse Y") * Time.deltaTime * mouseSensitivity;
@@ -147,7 +165,7 @@ public class PlayerController : NetworkBehaviour {
 
     private void ProcessInput(PlayerInput input)
     {
-        cc.SimpleMove(input.movement);
+        cc.Move(input.movement);
         transform.eulerAngles += input.rotation;
     }
 

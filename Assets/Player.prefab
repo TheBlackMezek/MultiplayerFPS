@@ -170,10 +170,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d2d85141d9a3624997654fff9f012b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 200
+  moveSpeed: 10
   mouseSensitivity: 200
   maxHp: 100
   bulletSpeed: 10
+  jumpForce: 10
+  gravForce: 15
   cam: {fileID: 20957832515418750}
   ls: {fileID: 81015119111135180}
   cc: {fileID: 143736471763792738}
