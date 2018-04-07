@@ -63,6 +63,7 @@ public class PlayerController : NetworkBehaviour {
         else
         {
             Cursor.lockState = CursorLockMode.Locked;
+            GlobalVars.localPlayer = this;
         }
     }
 
@@ -222,6 +223,11 @@ public class PlayerController : NetworkBehaviour {
     {
         hp = maxHp;
         transform.position = new Vector3(0, 10, 0);
+    }
+
+    public float GetHealth()
+    {
+        return hp;
     }
 
 }
