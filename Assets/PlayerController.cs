@@ -32,6 +32,7 @@ public class PlayerController : NetworkBehaviour {
     public float bulletSpeed = 10.0f;
     public float jumpForce = 100.0f;
     public float gravForce = 15.0f;
+    public float fireCooldown = 0.25f;
 
     public Camera cam;
     public AudioListener ls;
@@ -44,6 +45,7 @@ public class PlayerController : NetworkBehaviour {
     private int inputId = 0;
     private int inputIdMax = 10000;
     private float yVel = 0;
+    private float gunHeat = 0;
 
     [SyncVar]
     private float hp;
@@ -109,7 +111,13 @@ public class PlayerController : NetworkBehaviour {
         
         inputs.Add(input);
 
-        if(Input.GetMouseButtonDown(0))
+
+        if(gunHeat > 0)
+        {
+            gunHeat -= Time.deltaTime;
+        }
+
+        if(Input.GetMouseButton(0) && gunHeat <= 0)
         {
             CmdShoot();
         }
@@ -216,6 +224,8 @@ public class PlayerController : NetworkBehaviour {
     [Command]
     public void CmdShoot()
     {
+        gunHeat = fireCooldown;
+
         GameObject b = Instantiate(bulletPrefab);
         b.transform.position = transform.position + transform.forward * 2;
         b.transform.eulerAngles = transform.eulerAngles;
