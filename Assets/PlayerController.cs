@@ -33,6 +33,8 @@ public class PlayerController : NetworkBehaviour {
     public float jumpForce = 100.0f;
     public float gravForce = 15.0f;
     public float fireCooldown = 0.25f;
+    public float maxPitch = 89.0f;
+    public float minPitch = -89.0f;
 
     public Camera cam;
     public AudioListener ls;
@@ -175,6 +177,18 @@ public class PlayerController : NetworkBehaviour {
     {
         cc.Move(input.movement);
         transform.eulerAngles += input.rotation;
+        
+        if(transform.eulerAngles.x < maxPitch && transform.eulerAngles.x > minPitch)
+        {
+            if (input.rotation.x < 0)
+            {
+                transform.eulerAngles = new Vector3(maxPitch, transform.eulerAngles.y, transform.eulerAngles.z);
+            }
+            else
+            {
+                transform.eulerAngles = new Vector3(minPitch, transform.eulerAngles.y, transform.eulerAngles.z);
+            }
+        }
     }
 
     [Command]
@@ -226,13 +240,15 @@ public class PlayerController : NetworkBehaviour {
     {
         gunHeat = fireCooldown;
 
-        GameObject b = Instantiate(bulletPrefab);
+        //GameObject b = Instantiate(bulletPrefab);
+        GameObject b = GlobalVars.BulletPool.GetObject();
         b.transform.position = transform.position + transform.forward * 2;
         b.transform.eulerAngles = transform.eulerAngles;
         Rigidbody bbody = b.GetComponent<Rigidbody>();
+        bbody.velocity = Vector3.zero;
+        b.SetActive(true);
         bbody.AddForce(transform.forward * bulletSpeed, ForceMode.Impulse);
-
-        NetworkServer.Spawn(b);
+        //NetworkServer.Spawn(b);
     }
 
     [Command]

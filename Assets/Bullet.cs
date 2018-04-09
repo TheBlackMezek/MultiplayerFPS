@@ -16,12 +16,13 @@ public class Bullet : NetworkBehaviour {
 
     private void Kill()
     {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
+        hit = false;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(isServer && !hit)
+        if (isServer && !hit)
         {
             hit = true;
             if (collision.transform.tag == "Player")
@@ -29,7 +30,8 @@ public class Bullet : NetworkBehaviour {
                 PlayerController p = collision.transform.GetComponent<PlayerController>();
                 p.CmdDamage(damage);
             }
-            Destroy(gameObject);
+            
+            Kill();
         }
     }
 
