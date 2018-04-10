@@ -309,15 +309,104 @@ MonoBehaviour:
   - cmd.exe
   - cmd.exe
   - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
+  - cmd.exe
   args:
-  - /K tracert google.com
   - /K tracert bing.com
-  - /K tracert bay12games.com/dwarves
+  - /K tracert google.com
+  - /K tracert bay12games.com
   - /K tracert youtube.com
-  - /K tracert github.com
-  useArgs: 0101010101
+  - /K tracert linkedin.com
+  - /K tracert facebook.com
+  - /K tracert gitlab.com
+  - /K tracert unity3d.com
+  - /K tracert reddit.com
+  - /K tracert twitter.com
+  - /K tracert myspace.com
+  - /K tracert aol.com
+  - /K tracert minecraftforum.net
+  - /K tracert soundcloud.com
+  - /K tracert wikipedia.org
+  - /K tracert minecraft.net
+  - /K tracert pinterest.com
+  - /K tracert tumblr.com
+  - /K tracert deviantart.com
+  - /K tracert discordapp.com
+  - /K tracert baidu.com
+  - /K tracert yahoo.com
+  - /K tracert google.co.in
+  - /K tracert qq.com
+  - /K tracert amazon.com
+  - /K tracert taobao.com
+  - /K tracert tmall.com
+  - /K tracert google.co.jp
+  - /K tracert vk.com
+  - /K tracert instagram.com
+  - /K tracert live.com
+  - /K tracert sohu.com
+  - /K tracert sina.com.cn
+  - /K tracert jd.com
+  - /K tracert weibo.com
+  - /K tracert 360.cn
+  - /K tracert google.de
+  - /K tracert google.co.uk
+  - /K tracert google.com.br
+  - /K tracert google.fr
+  - /K tracert google.ru
+  - /K tracert yandex.ru
+  - /K tracert netflix.com
+  - /K tracert twitch.tv
+  - /K tracert google.it
+  - /K tracert list.tmall.com
+  - /K tracert google.com.hk
+  - /K tracert google.es
+  - /K tracert alipay.com
+  - /K tracert ebay.com
   nodePrefab: {fileID: 1748854608536392, guid: 69b73fca0bcb5e445ab9d789cbc99945, type: 2}
-  output: 
+  outputs: []
 --- !u!4 &1401063286
 Transform:
   m_ObjectHideFlags: 0

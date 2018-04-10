@@ -106,10 +106,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c16aeb176c948e44e8e83eb563448d0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posRange: 50
+  posRange: 100
+  streamStretch: 50
   ip: 
   connections: []
   lr: {fileID: 120386701490657866}
+  connsFromStart: 
 --- !u!120 &120386701490657866
 LineRenderer:
   m_ObjectHideFlags: 1

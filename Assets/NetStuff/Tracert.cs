@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading;
 
 
 
@@ -11,52 +12,76 @@ public class Tracert : MonoBehaviour {
 
     public string[] prog;
     public string[] args;
-    public bool[] useArgs;
     public GameObject nodePrefab;
 
-    private System.Diagnostics.Process p;
+    //private System.Diagnostics.Process p;
     private List<NetNode> nodes = new List<NetNode>();
-    public string output;
+    public List<string> outputs = new List<string>();
+    private delegate void ThreadCall(object data);
+    
+    private int lastOutputCount = 0;
 
 
     void Start () {
+        ThreadCall tc = ReceiveOutput;
         for(int i = 0; i < prog.Length; ++i)
         {
+            System.Diagnostics.Process p;
             p = new System.Diagnostics.Process();
             p.StartInfo.FileName = prog[i];
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.RedirectStandardOutput = true;
 
-            if (useArgs[i])
-            {
-                p.StartInfo.Arguments = args[i];
-            }
+            
+            p.StartInfo.Arguments = args[i];
 
             p.Start();
 
-
-            StartCoroutine("ReceiveOutput");
+            Thread thread = new Thread(new ParameterizedThreadStart(tc));
+            thread.Start(p);
         }
-        BuildNetModel();
-    }
-	
-	private IEnumerator ReceiveOutput()
-    {
-        output = p.StandardOutput.ReadToEnd();
-        AddTracertResults();
-        yield return null;
     }
 
-    private void AddTracertResults()
+    private void Update()
+    {
+        if(outputs.Count > lastOutputCount)
+        {
+            AddTracertResults(outputs[lastOutputCount]);
+            ++lastOutputCount;
+            BuildNetModel();
+        }
+    }
+
+
+
+    private void ReceiveOutput(object data)
+    {
+        System.Diagnostics.Process p = (System.Diagnostics.Process)data;
+        string output = p.StandardOutput.ReadToEnd();
+        lock (this)
+        {
+            outputs.Add(output);
+        }
+    }
+
+    private void AddTracertResults(string output)
     {
         string[] lines = output.Split();
         NetNode lastNode = null;
+        bool firstIp = true;
+        int connectionLength = 0;
 
         for(int i = 0; i < lines.Length; ++i)
         {
             string l = lines[i];
             if(l.Length > 0 && (l[0] == '[' || (!StrContainsLetters(l) && CountChars(l, '.') == 3)))
             {
+                if(firstIp)
+                {
+                    firstIp = false;
+                    continue;
+                }
+
                 if(l[0] == '[')
                 {
                     l = l.Remove(l.Length - 1, 1);
@@ -78,10 +103,12 @@ public class Tracert : MonoBehaviour {
                     node.ip[3] = (byte)int.Parse(l);
                     nodes.Add(node);
                 }
+                node.connsFromStart.Add(connectionLength);
+                ++connectionLength;
 
-                if(lastNode != null)
+                if (lastNode != null)
                 {
-                    node.connections.Add(lastNode);
+                    lastNode.connections.Add(node);
                 }
 
                 lastNode = node;
@@ -94,7 +121,7 @@ public class Tracert : MonoBehaviour {
     {
         foreach (NetNode n in nodes)
         {
-            n.RandPos();
+            n.CalcPos(NetNode.PosMode.RIVER);
         }
         foreach (NetNode n in nodes)
         {

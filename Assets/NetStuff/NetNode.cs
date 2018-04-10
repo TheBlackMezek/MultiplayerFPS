@@ -4,11 +4,21 @@ using UnityEngine;
 
 public class NetNode : MonoBehaviour {
 
+    public enum PosMode
+    {
+        RANDOM,
+        RIVER
+    }
+
     public float posRange = 50.0f;
+    public float streamStretch = 25.0f;
 
     public byte[] ip;
     public List<NetNode> connections;
     public LineRenderer lr;
+    public List<int> connsFromStart = new List<int>();
+
+    private float riverZPos = float.MinValue;
 
     public string IpString
     {
@@ -26,11 +36,30 @@ public class NetNode : MonoBehaviour {
         }
     }
 
-    public void RandPos()
+    public void CalcPos(PosMode mode)
     {
-        transform.position = new Vector3(Random.Range(-posRange, posRange),
-                                         Random.Range(-posRange, posRange),
-                                         Random.Range(-posRange, posRange));
+        if(riverZPos == float.MinValue)
+        {
+            riverZPos = Random.Range(-posRange, posRange);
+        }
+
+        if(mode == PosMode.RANDOM)
+        {
+            transform.position = new Vector3(Random.Range(-posRange, posRange),
+                                             Random.Range(-posRange, posRange),
+                                             Random.Range(-posRange, posRange));
+        }
+        else if(mode == PosMode.RIVER)
+        {
+            float avg = 0;
+            foreach(int i in connsFromStart)
+            {
+                avg += i;
+            }
+            avg = avg / connsFromStart.Count;
+
+            transform.position = new Vector3(avg * streamStretch, 0, riverZPos);
+        }
     }
 
     public void Setup()
