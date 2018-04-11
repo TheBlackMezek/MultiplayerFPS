@@ -7,11 +7,19 @@ public class Bullet : NetworkBehaviour {
 
     public float damage = 10.0f;
     public float lifetime = 5.0f;
+
     private bool hit = false;
+
+
+
 
     private void Start()
     {
         Invoke("Kill", lifetime);
+        if(isServer)
+        {
+            RpcSyncParent(transform.parent.gameObject);
+        }
     }
 
     private void Kill()
@@ -22,10 +30,10 @@ public class Bullet : NetworkBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (isServer && !hit)
+        if (!hit)
         {
             hit = true;
-            if (collision.transform.tag == "Player")
+            if (isServer && collision.transform.tag == "Player")
             {
                 PlayerController p = collision.transform.GetComponent<PlayerController>();
                 p.CmdDamage(damage);
@@ -33,6 +41,14 @@ public class Bullet : NetworkBehaviour {
             
             Kill();
         }
+    }
+
+
+
+    [ClientRpc]
+    public void RpcSyncParent(GameObject p)
+    {
+        transform.parent = p.transform;
     }
 
 }

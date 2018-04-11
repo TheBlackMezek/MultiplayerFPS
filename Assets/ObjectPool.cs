@@ -25,8 +25,10 @@ public class ObjectPool : NetworkBehaviour {
             o.transform.parent = transform;
             NetworkServer.Spawn(o);
         }
+        
     }
-
+    
+    
     
     public GameObject GetObject()
     {
@@ -47,7 +49,29 @@ public class ObjectPool : NetworkBehaviour {
         }
         poolSize *= 2;
 
+        if(isServer)
+        {
+            RpcIncreasePoolSize();
+        }
+
         return transform.GetChild(poolSize / 2).gameObject;
+    }
+
+    [ClientRpc]
+    public void RpcIncreasePoolSize()
+    {
+        //for (int i = 0; i < poolsize; ++i)
+        //{
+        //    gameobject o = instantiate(prefab);
+        //    o.setactive(false);
+        //    o.transform.parent = transform;
+        //    networkserver.spawn(o);
+        //}
+        if (!isServer)
+        {
+            poolSize *= 2;
+        }
+
     }
 
 }

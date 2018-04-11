@@ -248,7 +248,24 @@ public class PlayerController : NetworkBehaviour {
         bbody.velocity = Vector3.zero;
         b.SetActive(true);
         bbody.AddForce(transform.forward * bulletSpeed, ForceMode.Impulse);
+
+        //RpcShoot(b);
         //NetworkServer.Spawn(b);
+    }
+
+    [ClientRpc]
+    public void RpcShoot(GameObject b)
+    {
+        if(isServer)
+        {
+            return;
+        }
+        b.transform.position = transform.position + transform.forward * 2;
+        b.transform.eulerAngles = transform.eulerAngles;
+        Rigidbody bbody = b.GetComponent<Rigidbody>();
+        bbody.velocity = Vector3.zero;
+        b.SetActive(true);
+        bbody.AddForce(transform.forward * bulletSpeed, ForceMode.Impulse);
     }
 
     [Command]
