@@ -35,7 +35,7 @@ public class Bullet : NetworkBehaviour {
             hit = true;
             if (isServer && collision.transform.tag == "Player")
             {
-                PlayerController p = collision.transform.GetComponent<PlayerController>();
+                PlayerController p = collision.transform.parent.GetComponent<PlayerController>();
                 p.CmdDamage(damage);
             }
             

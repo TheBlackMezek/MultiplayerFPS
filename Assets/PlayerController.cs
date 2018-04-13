@@ -39,6 +39,7 @@ public class PlayerController : NetworkBehaviour {
     public Camera cam;
     public AudioListener ls;
     public CharacterController cc;
+    public GameObject avatar;
     public GameObject bulletPrefab;
 
     private PlayerState lastVerifiedState;
@@ -57,8 +58,8 @@ public class PlayerController : NetworkBehaviour {
     private void Start()
     {
         lastVerifiedState.id = 0;
-        lastVerifiedState.position = transform.position;
-        lastVerifiedState.euler = transform.eulerAngles;
+        lastVerifiedState.position = avatar.transform.position;
+        lastVerifiedState.euler = avatar.transform.eulerAngles;
 
         hp = maxHp;
 
@@ -94,7 +95,7 @@ public class PlayerController : NetworkBehaviour {
 
         float x = Input.GetAxisRaw("Horizontal") * Time.deltaTime * moveSpeed;
         float z = Input.GetAxisRaw("Vertical") * Time.deltaTime * moveSpeed;
-        Vector3 move = transform.right * x + transform.forward * z;
+        Vector3 move = avatar.transform.right * x + avatar.transform.forward * z;
 
         if(Input.GetAxisRaw("Jump") > 0 && cc.isGrounded)
         {
@@ -136,8 +137,8 @@ public class PlayerController : NetworkBehaviour {
         {
             PlayerState state;
             state.id = inputId;
-            state.position = transform.position;
-            state.euler = transform.eulerAngles;
+            state.position = avatar.transform.position;
+            state.euler = avatar.transform.eulerAngles;
             RpcVerifyState(state);
             return;
         }
@@ -176,17 +177,17 @@ public class PlayerController : NetworkBehaviour {
     private void ProcessInput(PlayerInput input)
     {
         cc.Move(input.movement);
-        transform.eulerAngles += input.rotation;
+        avatar.transform.eulerAngles += input.rotation;
         
-        if(transform.eulerAngles.x < maxPitch && transform.eulerAngles.x > minPitch)
+        if(avatar.transform.eulerAngles.x < maxPitch && avatar.transform.eulerAngles.x > minPitch)
         {
             if (input.rotation.x < 0)
             {
-                transform.eulerAngles = new Vector3(maxPitch, transform.eulerAngles.y, transform.eulerAngles.z);
+                avatar.transform.eulerAngles = new Vector3(maxPitch, avatar.transform.eulerAngles.y, avatar.transform.eulerAngles.z);
             }
             else
             {
-                transform.eulerAngles = new Vector3(minPitch, transform.eulerAngles.y, transform.eulerAngles.z);
+                avatar.transform.eulerAngles = new Vector3(minPitch, avatar.transform.eulerAngles.y, avatar.transform.eulerAngles.z);
             }
         }
     }
@@ -199,8 +200,8 @@ public class PlayerController : NetworkBehaviour {
             ProcessInputPacket(packet);
 
             PlayerState state;
-            state.euler = transform.eulerAngles;
-            state.position = transform.position;
+            state.euler = avatar.transform.eulerAngles;
+            state.position = avatar.transform.position;
             state.id = packet.id;
 
             RpcVerifyState(state);
@@ -216,8 +217,8 @@ public class PlayerController : NetworkBehaviour {
         }
         lastVerifiedState = state;
 
-        transform.position = lastVerifiedState.position;
-        transform.eulerAngles = lastVerifiedState.euler;
+        avatar.transform.position = lastVerifiedState.position;
+        avatar.transform.eulerAngles = lastVerifiedState.euler;
 
         for (int i = 0; i < packets.Count; ++i)
         {
@@ -242,12 +243,12 @@ public class PlayerController : NetworkBehaviour {
 
         //GameObject b = Instantiate(bulletPrefab);
         GameObject b = GlobalVars.BulletPool.GetObject();
-        b.transform.position = transform.position + transform.forward * 2;
-        b.transform.eulerAngles = transform.eulerAngles;
+        b.transform.position = avatar.transform.position + avatar.transform.forward * 2;
+        b.transform.eulerAngles = avatar.transform.eulerAngles;
         Rigidbody bbody = b.GetComponent<Rigidbody>();
         bbody.velocity = Vector3.zero;
         b.SetActive(true);
-        bbody.AddForce(transform.forward * bulletSpeed, ForceMode.Impulse);
+        bbody.AddForce(avatar.transform.forward * bulletSpeed, ForceMode.Impulse);
 
         //RpcShoot(b);
         //NetworkServer.Spawn(b);
@@ -260,12 +261,12 @@ public class PlayerController : NetworkBehaviour {
         {
             return;
         }
-        b.transform.position = transform.position + transform.forward * 2;
-        b.transform.eulerAngles = transform.eulerAngles;
+        b.transform.position = avatar.transform.position + avatar.transform.forward * 2;
+        b.transform.eulerAngles = avatar.transform.eulerAngles;
         Rigidbody bbody = b.GetComponent<Rigidbody>();
         bbody.velocity = Vector3.zero;
         b.SetActive(true);
-        bbody.AddForce(transform.forward * bulletSpeed, ForceMode.Impulse);
+        bbody.AddForce(avatar.transform.forward * bulletSpeed, ForceMode.Impulse);
     }
 
     [Command]
@@ -283,7 +284,7 @@ public class PlayerController : NetworkBehaviour {
     public void CmdKill()
     {
         hp = maxHp;
-        transform.position = new Vector3(0, 10, 0);
+        avatar.transform.position = new Vector3(0, 10, 0);
     }
 
     public float GetHealth()
