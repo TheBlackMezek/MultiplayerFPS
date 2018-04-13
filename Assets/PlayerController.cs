@@ -40,7 +40,7 @@ public class PlayerController : NetworkBehaviour {
     public AudioListener ls;
     public CharacterController cc;
     public GameObject avatar;
-    public GameObject bulletPrefab;
+    public ObjectPool bulletPool;
 
     private PlayerState lastVerifiedState;
     private List<PlayerInput> inputs = new List<PlayerInput>();
@@ -242,7 +242,8 @@ public class PlayerController : NetworkBehaviour {
         gunHeat = fireCooldown;
 
         //GameObject b = Instantiate(bulletPrefab);
-        GameObject b = GlobalVars.BulletPool.GetObject();
+        //GameObject b = GlobalVars.BulletPool.GetObject();
+        GameObject b = bulletPool.GetObject();
         b.transform.position = avatar.transform.position + avatar.transform.forward * 2;
         b.transform.eulerAngles = avatar.transform.eulerAngles;
         Rigidbody bbody = b.GetComponent<Rigidbody>();

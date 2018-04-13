@@ -7,32 +7,47 @@ public class ObjectPool : NetworkBehaviour {
 
     public GameObject prefab;
     public int initialPoolSize = 10;
+    public Transform poolHolder;
     private int poolSize;
 
     private void Start()
     {
-        if (!isServer)
-        {
-            return;
-        }
+        //Debug.Log(isServer);
+        //if (!isServer)
+        //{
+        //    return;
+        //}
+        //
+        //poolSize = initialPoolSize;
+        //
+        //for(int i = 0; i < initialPoolSize; ++i)
+        //{
+        //    GameObject o = Instantiate(prefab);
+        //    o.SetActive(false);
+        //    o.transform.parent = poolHolder;
+        //    NetworkServer.Spawn(o);
+        //}
+        
+    }
 
+    public override void OnStartServer()
+    {
         poolSize = initialPoolSize;
 
-        for(int i = 0; i < initialPoolSize; ++i)
+        for (int i = 0; i < initialPoolSize; ++i)
         {
             GameObject o = Instantiate(prefab);
             o.SetActive(false);
-            o.transform.parent = transform;
+            o.transform.parent = poolHolder;
             NetworkServer.Spawn(o);
         }
-        
     }
-    
-    
-    
+
+
+
     public GameObject GetObject()
     {
-        foreach(Transform child in transform)
+        foreach(Transform child in poolHolder)
         {
             if(!child.gameObject.activeInHierarchy)
             {
@@ -44,7 +59,7 @@ public class ObjectPool : NetworkBehaviour {
         {
             GameObject o = Instantiate(prefab);
             o.SetActive(false);
-            o.transform.parent = transform;
+            o.transform.parent = poolHolder;
             NetworkServer.Spawn(o);
         }
         poolSize *= 2;
@@ -54,7 +69,7 @@ public class ObjectPool : NetworkBehaviour {
             RpcIncreasePoolSize();
         }
 
-        return transform.GetChild(poolSize / 2).gameObject;
+        return poolHolder.GetChild(poolSize / 2).gameObject;
     }
 
     [ClientRpc]
@@ -64,7 +79,7 @@ public class ObjectPool : NetworkBehaviour {
         //{
         //    gameobject o = instantiate(prefab);
         //    o.setactive(false);
-        //    o.transform.parent = transform;
+        //    o.transform.parent = poolHolder;
         //    networkserver.spawn(o);
         //}
         if (!isServer)

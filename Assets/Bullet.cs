@@ -16,10 +16,11 @@ public class Bullet : NetworkBehaviour {
     private void Start()
     {
         Invoke("Kill", lifetime);
-        if(isServer)
-        {
-            RpcSyncParent(transform.parent.gameObject);
-        }
+    }
+
+    public override void OnStartServer()
+    {
+        RpcSyncParent(transform.parent.gameObject);
     }
 
     private void Kill()
