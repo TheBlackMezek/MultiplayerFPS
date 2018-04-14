@@ -251,7 +251,7 @@ public class PlayerController : NetworkBehaviour {
         b.SetActive(true);
         bbody.AddForce(avatar.transform.forward * bulletSpeed, ForceMode.Impulse);
 
-        //RpcShoot(b);
+        RpcShoot(b);
         //NetworkServer.Spawn(b);
     }
 

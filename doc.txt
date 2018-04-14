@@ -1,0 +1,3 @@
+bullet pools do not carry over to new clients
+players need to REQUEST to shoot a bullet while shooting their own
+If request turned down, server needs to tell client to de-activate bullet and set weapon heat to what it's supposed to be

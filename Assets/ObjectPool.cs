@@ -7,7 +7,9 @@ public class ObjectPool : NetworkBehaviour {
 
     public GameObject prefab;
     public int initialPoolSize = 10;
-    public Transform poolHolder;
+    //public Transform poolHolder;
+    [SyncVar]
+    private List<GameObject> pool;
     private int poolSize;
 
     private void Start()
@@ -38,8 +40,9 @@ public class ObjectPool : NetworkBehaviour {
         {
             GameObject o = Instantiate(prefab);
             o.SetActive(false);
-            o.transform.parent = poolHolder;
+            //o.transform.parent = poolHolder;
             NetworkServer.Spawn(o);
+            RpcSetPooledObjParent(o);
         }
     }
 
@@ -47,9 +50,9 @@ public class ObjectPool : NetworkBehaviour {
 
     public GameObject GetObject()
     {
-        foreach(Transform child in poolHolder)
+        foreach(GameObject child in pool)
         {
-            if(!child.gameObject.activeInHierarchy)
+            if(!child.activeInHierarchy)
             {
                 return child.gameObject;
             }
@@ -59,8 +62,9 @@ public class ObjectPool : NetworkBehaviour {
         {
             GameObject o = Instantiate(prefab);
             o.SetActive(false);
-            o.transform.parent = poolHolder;
+            //o.transform.parent = poolHolder;
             NetworkServer.Spawn(o);
+            RpcSetPooledObjParent(o);
         }
         poolSize *= 2;
 
@@ -69,7 +73,17 @@ public class ObjectPool : NetworkBehaviour {
             RpcIncreasePoolSize();
         }
 
-        return poolHolder.GetChild(poolSize / 2).gameObject;
+        //return poolHolder.GetChild(poolSize / 2).gameObject;
+        return pool[pool.Capacity / 2];
+    }
+
+    [ClientRpc]
+    public void RpcSetPooledObjParent(GameObject obj)
+    {
+        if(!isServer)
+        {
+            //obj.transform.parent = poolHolder;
+        }
     }
 
     [ClientRpc]

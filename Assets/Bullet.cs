@@ -20,7 +20,7 @@ public class Bullet : NetworkBehaviour {
 
     public override void OnStartServer()
     {
-        RpcSyncParent(transform.parent.gameObject);
+        //RpcSyncParent(transform.parent.gameObject);
     }
 
     private void Kill()
