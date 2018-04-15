@@ -8,7 +8,7 @@ public class ObjectPool : NetworkBehaviour {
     public GameObject prefab;
     public int initialPoolSize = 10;
     //public Transform poolHolder;
-    [SyncVar]
+    
     private List<GameObject> pool;
     private int poolSize;
 
