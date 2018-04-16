@@ -146,7 +146,12 @@ public class PlacerController : NetworkBehaviour {
             }
             else if(Input.GetMouseButtonDown(1) && hit.transform.tag == "Art")
             {
-                Destroy(hit.transform.parent.gameObject);
+                //Destroy(hit.transform.parent.gameObject);
+                if (hit.transform.GetComponent<PlacerController>() == null)
+                {
+                    //NetworkServer.Destroy(hit.transform.parent.gameObject);
+                    CmdDestroyArt(hit.transform.parent.gameObject);
+                }
             }
             else if(Input.GetMouseButtonDown(2) && hit.transform.tag == "Art" && paints.Length > 0)
             {
@@ -196,6 +201,13 @@ public class PlacerController : NetworkBehaviour {
     }
 
 
+
+    [Command]
+    private void CmdDestroyArt(GameObject art)
+    {
+        NetworkServer.Destroy(art);
+    }
+    
     [Command]
     private void CmdPaintArt(GameObject obj, Color color)
     {
