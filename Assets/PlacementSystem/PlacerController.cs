@@ -150,7 +150,14 @@ public class PlacerController : NetworkBehaviour {
             }
             else if(Input.GetMouseButtonDown(2) && hit.transform.tag == "Art" && paints.Length > 0)
             {
-                CmdPaintArt(hit.transform.parent.gameObject, paints[paintIdx]);
+                if(hit.transform.GetComponent<PlacerController>() != null)
+                {
+                    CmdPaintArt(hit.transform.gameObject, paints[paintIdx]);
+                }
+                else
+                {
+                    CmdPaintArt(hit.transform.parent.gameObject, paints[paintIdx]);
+                }
             }
         }
         else

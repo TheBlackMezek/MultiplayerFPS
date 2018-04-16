@@ -38,16 +38,17 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4689212463033124}
+  - component: {fileID: 114282614343585160}
+  - component: {fileID: 114863307055671160}
   - component: {fileID: 33493164962867092}
   - component: {fileID: 136953681284551866}
   - component: {fileID: 23046706710207256}
-  - component: {fileID: 114282614343585160}
   - component: {fileID: 143637051954290878}
   - component: {fileID: 114712881625381954}
   - component: {fileID: 114512942376945880}
   m_Layer: 0
   m_Name: Avatar
-  m_TagString: Untagged
+  m_TagString: Art
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72,7 +73,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1774032290127214}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 6.4889717, y: -1.8445874, z: 2.6286075}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4132155205543872}
@@ -256,6 +257,18 @@ MonoBehaviour:
     i15: 153
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114863307055671160
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1774032290127214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e637c66ed2eb33c4fb1f5ed1163470b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderer: {fileID: 23046706710207256}
 --- !u!124 &124772015077466740
 Behaviour:
   m_ObjectHideFlags: 1
