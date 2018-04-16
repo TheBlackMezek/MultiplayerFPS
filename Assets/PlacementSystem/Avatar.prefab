@@ -183,11 +183,11 @@ MonoBehaviour:
   moveSpeed: 10
   jumpForce: 20
   gravForce: 50
-  prefab: {fileID: 1411769459864080, guid: 08c2d5142a4de5e498b97ca5a10fb71c, type: 2}
-  ghostMat: {fileID: 2100000, guid: c2853bad2bc3ccb478b112069d1d5593, type: 2}
-  cam: {fileID: 20495756251148894}
-  ls: {fileID: 81892299437963828}
-  cc: {fileID: 143637051954290878}
+  worldFloor: -5
+  prefabs:
+  - {fileID: 1411769459864080, guid: 08c2d5142a4de5e498b97ca5a10fb71c, type: 2}
+  - {fileID: 1963465818421392, guid: 263d66e22cf35b14aa5e0591874ba126, type: 2}
+  - {fileID: 1590515225538072, guid: da7bb03063c29ae419aa376b438543d7, type: 2}
   paints:
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: 1, g: 0, b: 0, a: 1}
@@ -199,6 +199,10 @@ MonoBehaviour:
   - {r: 0.5882353, g: 0.39215687, b: 0, a: 1}
   - {r: 0, g: 0.5882353, b: 0, a: 1}
   - {r: 0, g: 0, b: 0, a: 1}
+  ghostMat: {fileID: 2100000, guid: c2853bad2bc3ccb478b112069d1d5593, type: 2}
+  cam: {fileID: 20495756251148894}
+  ls: {fileID: 81892299437963828}
+  cc: {fileID: 143637051954290878}
 --- !u!114 &114512942376945880
 MonoBehaviour:
   m_ObjectHideFlags: 1

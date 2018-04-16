@@ -168,6 +168,8 @@ MonoBehaviour:
   m_OnlineScene: PlacementScene
   m_SpawnPrefabs:
   - {fileID: 1411769459864080, guid: 08c2d5142a4de5e498b97ca5a10fb71c, type: 2}
+  - {fileID: 1963465818421392, guid: 263d66e22cf35b14aa5e0591874ba126, type: 2}
+  - {fileID: 1590515225538072, guid: da7bb03063c29ae419aa376b438543d7, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

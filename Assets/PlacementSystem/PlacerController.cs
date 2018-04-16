@@ -11,12 +11,12 @@ public class PlacerController : NetworkBehaviour {
     public float gravForce = 1.0f;
     public float worldFloor = -5.0f;
 
-    public GameObject prefab;
+    public GameObject[] prefabs;
+    public Color[] paints;
     public Material ghostMat;
     public Camera cam;
     public AudioListener ls;
     public CharacterController cc;
-    public Color[] paints;
 
     public delegate void OnColorChange();
     public OnColorChange onColorChange;
@@ -24,6 +24,7 @@ public class PlacerController : NetworkBehaviour {
     private GameObject ghost = null;
     private float yvel = 0;
     private Color artColor;
+    private int prefabIdx = 0;
     private int paintIdx = 0;
 
 
@@ -39,11 +40,7 @@ public class PlacerController : NetworkBehaviour {
 
         GlobalVars.localPlacer = this;
 
-        ghost = Instantiate(prefab);
-        ghost.GetComponentInChildren<Renderer>().material = ghostMat;
-        ghost.GetComponentInChildren<Collider>().enabled = false;
-
-        SetArtColor(paints[paintIdx]);
+        MakeGhost();
 
         Cursor.lockState = CursorLockMode.Locked;
 	}
@@ -58,7 +55,27 @@ public class PlacerController : NetworkBehaviour {
         Cursor.lockState = CursorLockMode.Locked;
 
 
-        if(Input.GetAxisRaw("Mouse ScrollWheel") > 0)
+
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            ++prefabIdx;
+            if (prefabIdx >= prefabs.Length)
+            {
+                prefabIdx = 0;
+            }
+            MakeGhost();
+        }
+        else if (Input.GetKeyDown(KeyCode.Q))
+        {
+            --prefabIdx;
+            if (prefabIdx < 0)
+            {
+                prefabIdx = prefabs.Length - 1;
+            }
+            MakeGhost();
+        }
+
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
         {
             ++paintIdx;
             if(paintIdx >= paints.Length)
@@ -76,6 +93,7 @@ public class PlacerController : NetworkBehaviour {
             }
             SetArtColor(paints[paintIdx]);
         }
+
 
 
         if (!cc.isGrounded)
@@ -124,7 +142,7 @@ public class PlacerController : NetworkBehaviour {
 
             if(Input.GetMouseButtonDown(0))
             {
-                CmdSpawnArt(hit.point, ghost.transform.rotation, paints[paintIdx]);
+                CmdSpawnArt(prefabIdx, hit.point, ghost.transform.rotation, paints[paintIdx]);
             }
             else if(Input.GetMouseButtonDown(1) && hit.transform.tag == "Art")
             {
@@ -141,6 +159,19 @@ public class PlacerController : NetworkBehaviour {
         }
 	}
 
+
+    private void MakeGhost()
+    {
+        if(ghost != null)
+        {
+            Destroy(ghost);
+        }
+        ghost = Instantiate(prefabs[prefabIdx]);
+        ghost.GetComponentInChildren<Renderer>().material = ghostMat;
+        ghost.GetComponentInChildren<Collider>().enabled = false;
+
+        SetArtColor(paints[paintIdx]);
+    }
 
     private void SetArtColor(Color color)
     {
@@ -165,9 +196,9 @@ public class PlacerController : NetworkBehaviour {
     }
 
     [Command]
-    private void CmdSpawnArt(Vector3 pos, Quaternion rot, Color color)
+    private void CmdSpawnArt(int pfidx, Vector3 pos, Quaternion rot, Color color)
     {
-        GameObject art = Instantiate(prefab, pos, rot);
+        GameObject art = Instantiate(prefabs[pfidx], pos, rot);
         art.GetComponentInChildren<Renderer>().material.color = color;
         //art.GetComponent<ArtPiece>().CmdSetColor(paints[paintIdx]);
         //CmdPaintArt(art);
