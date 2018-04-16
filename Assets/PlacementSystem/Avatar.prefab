@@ -200,6 +200,7 @@ MonoBehaviour:
   - {r: 0.5882353, g: 0.39215687, b: 0, a: 1}
   - {r: 0, g: 0.5882353, b: 0, a: 1}
   - {r: 0, g: 0, b: 0, a: 1}
+  - {r: 0.4705882, g: 0.4705882, b: 0.4705882, a: 1}
   ghostMat: {fileID: 2100000, guid: c2853bad2bc3ccb478b112069d1d5593, type: 2}
   cam: {fileID: 20495756251148894}
   ls: {fileID: 81892299437963828}
@@ -269,6 +270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderer: {fileID: 23046706710207256}
+  height: 0
 --- !u!124 &124772015077466740
 Behaviour:
   m_ObjectHideFlags: 1

@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class ArtPiece : NetworkBehaviour {
 
     public Renderer renderer;
+    public float height;
     [SyncVar]
     private Color matCol;
 

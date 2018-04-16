@@ -26,6 +26,9 @@ public class PlacerController : NetworkBehaviour {
     private Color artColor;
     private int prefabIdx = 0;
     private int paintIdx = 0;
+    private bool snapOn = false;
+    private float snapSize = 1.0f;
+    private float pieceHeight;
 
 
 	
@@ -41,6 +44,7 @@ public class PlacerController : NetworkBehaviour {
         GlobalVars.localPlacer = this;
 
         MakeGhost();
+        pieceHeight = prefabs[prefabIdx].GetComponent<ArtPiece>().height;
 
         Cursor.lockState = CursorLockMode.Locked;
 	}
@@ -63,6 +67,7 @@ public class PlacerController : NetworkBehaviour {
             {
                 prefabIdx = 0;
             }
+            pieceHeight = prefabs[prefabIdx].GetComponent<ArtPiece>().height;
             MakeGhost();
         }
         else if (Input.GetKeyDown(KeyCode.Q))
@@ -72,6 +77,7 @@ public class PlacerController : NetworkBehaviour {
             {
                 prefabIdx = prefabs.Length - 1;
             }
+            pieceHeight = prefabs[prefabIdx].GetComponent<ArtPiece>().height;
             MakeGhost();
         }
 
@@ -92,6 +98,17 @@ public class PlacerController : NetworkBehaviour {
                 paintIdx = paints.Length - 1;
             }
             SetArtColor(paints[paintIdx]);
+        }
+
+
+
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            snapOn = true;
+        }
+        else
+        {
+            snapOn = false;
         }
 
 
@@ -139,17 +156,23 @@ public class PlacerController : NetworkBehaviour {
             ghost.transform.position = hit.point;
             ghost.transform.LookAt(hit.point + hit.normal);
             ghost.transform.Rotate(Vector3.right * 90);
+            ghost.transform.position += ghost.transform.up * (pieceHeight / 2.0f);
+            if (snapOn)
+            {
+                Vector3 pos = ghost.transform.position;
+                ghost.transform.position = new Vector3(Mathf.Round(pos.x / snapSize) * snapSize,
+                                                       Mathf.Round(pos.y / snapSize) * snapSize,
+                                                       Mathf.Round(pos.z / snapSize) * snapSize);
+            }
 
             if(Input.GetMouseButtonDown(0))
             {
-                CmdSpawnArt(prefabIdx, hit.point, ghost.transform.rotation, paints[paintIdx]);
+                CmdSpawnArt(prefabIdx, ghost.transform.position, ghost.transform.rotation, paints[paintIdx]);
             }
             else if(Input.GetMouseButtonDown(1) && hit.transform.tag == "Art")
             {
-                //Destroy(hit.transform.parent.gameObject);
                 if (hit.transform.GetComponent<PlacerController>() == null)
                 {
-                    //NetworkServer.Destroy(hit.transform.parent.gameObject);
                     CmdDestroyArt(hit.transform.parent.gameObject);
                 }
             }
@@ -219,8 +242,6 @@ public class PlacerController : NetworkBehaviour {
     {
         GameObject art = Instantiate(prefabs[pfidx], pos, rot);
         art.GetComponentInChildren<Renderer>().material.color = color;
-        //art.GetComponent<ArtPiece>().CmdSetColor(paints[paintIdx]);
-        //CmdPaintArt(art);
 
         NetworkServer.Spawn(art);
     }
