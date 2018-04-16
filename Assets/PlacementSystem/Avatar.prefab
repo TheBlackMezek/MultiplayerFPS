@@ -188,11 +188,17 @@ MonoBehaviour:
   cam: {fileID: 20495756251148894}
   ls: {fileID: 81892299437963828}
   cc: {fileID: 143637051954290878}
-  paintMats:
-  - {fileID: 2100000, guid: 2de2ba4816da38847b78c6bf937b76b0, type: 2}
-  - {fileID: 2100000, guid: 96b9f476ae5c64b4bae153d757f86d9d, type: 2}
-  - {fileID: 2100000, guid: 374fae2c91b5b454d8807501cca712f3, type: 2}
-  - {fileID: 2100000, guid: 8459d6f36feeb484b8d741bddeabb52f, type: 2}
+  paints:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 1, a: 1}
+  - {r: 0.5882353, g: 0.39215687, b: 0, a: 1}
+  - {r: 0, g: 0.5882353, b: 0, a: 1}
+  - {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &114512942376945880
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -9,9 +9,11 @@ public class ArtPiece : NetworkBehaviour {
     [SyncVar]
     private Color matCol;
 
+
+
     public override void OnStartClient()
     {
-        if(matCol != null)
+        if (matCol != null)
         {
             renderer.material.color = matCol;
         }
@@ -20,6 +22,7 @@ public class ArtPiece : NetworkBehaviour {
     public override void OnStartServer()
     {
         matCol = renderer.material.color;
+        //CmdSetColorsOnStart();
     }
 
     [Command]

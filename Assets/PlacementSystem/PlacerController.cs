@@ -9,16 +9,22 @@ public class PlacerController : NetworkBehaviour {
     public float moveSpeed = 50.0f;
     public float jumpForce = 10.0f;
     public float gravForce = 1.0f;
+    public float worldFloor = -5.0f;
 
     public GameObject prefab;
     public Material ghostMat;
     public Camera cam;
     public AudioListener ls;
     public CharacterController cc;
-    public Material[] paintMats;
+    public Color[] paints;
+
+    public delegate void OnColorChange();
+    public OnColorChange onColorChange;
 
     private GameObject ghost = null;
     private float yvel = 0;
+    private Color artColor;
+    private int paintIdx = 0;
 
 
 	
@@ -30,9 +36,14 @@ public class PlacerController : NetworkBehaviour {
             ls.enabled = false;
             return;
         }
+
+        GlobalVars.localPlacer = this;
+
         ghost = Instantiate(prefab);
         ghost.GetComponentInChildren<Renderer>().material = ghostMat;
         ghost.GetComponentInChildren<Collider>().enabled = false;
+
+        SetArtColor(paints[paintIdx]);
 
         Cursor.lockState = CursorLockMode.Locked;
 	}
@@ -44,7 +55,30 @@ public class PlacerController : NetworkBehaviour {
             return;
         }
 
-        if(!cc.isGrounded)
+        Cursor.lockState = CursorLockMode.Locked;
+
+
+        if(Input.GetAxisRaw("Mouse ScrollWheel") > 0)
+        {
+            ++paintIdx;
+            if(paintIdx >= paints.Length)
+            {
+                paintIdx = 0;
+            }
+            SetArtColor(paints[paintIdx]);
+        }
+        else if(Input.GetAxisRaw("Mouse ScrollWheel") < 0)
+        {
+            --paintIdx;
+            if(paintIdx < 0)
+            {
+                paintIdx = paints.Length - 1;
+            }
+            SetArtColor(paints[paintIdx]);
+        }
+
+
+        if (!cc.isGrounded)
         {
             yvel -= gravForce * Time.deltaTime;
         }
@@ -63,6 +97,13 @@ public class PlacerController : NetworkBehaviour {
         Vector3 movey = Vector3.up * yvel * Time.deltaTime;
         
         cc.Move(movex + movez + movey);
+
+        if(transform.position.y < worldFloor)
+        {
+            transform.position = Vector3.zero;
+        }
+
+
 
         float roty = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float rotx = -Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
@@ -83,25 +124,15 @@ public class PlacerController : NetworkBehaviour {
 
             if(Input.GetMouseButtonDown(0))
             {
-                CmdSpawnArt(hit.point, ghost.transform.rotation);
-                //GameObject o = Instantiate(prefab);
-                //
-                //o.transform.position = hit.point;
-                //o.transform.rotation = ghost.transform.rotation;
-                //
-                //NetworkServer.Spawn(o);
+                CmdSpawnArt(hit.point, ghost.transform.rotation, paints[paintIdx]);
             }
             else if(Input.GetMouseButtonDown(1) && hit.transform.tag == "Art")
             {
                 Destroy(hit.transform.parent.gameObject);
             }
-            else if(Input.GetMouseButtonDown(2) && hit.transform.tag == "Art" && paintMats.Length > 0)
+            else if(Input.GetMouseButtonDown(2) && hit.transform.tag == "Art" && paints.Length > 0)
             {
-                CmdModArt(hit.transform.parent.gameObject);
-                //hit.transform.GetComponent<Renderer>().material = paintMats[Random.Range(0, paintMats.Length)];
-                //hit.transform.parent.GetComponent<NetworkIdentity>().AssignClientAuthority(connectionToClient);
-                //hit.transform.parent.GetComponent<ArtPiece>().CmdSetColor(paintMats[Random.Range(0, paintMats.Length)].color);
-                //hit.transform.parent.GetComponent<NetworkIdentity>().RemoveClientAuthority(connectionToClient);
+                CmdPaintArt(hit.transform.parent.gameObject, paints[paintIdx]);
             }
         }
         else
@@ -110,18 +141,36 @@ public class PlacerController : NetworkBehaviour {
         }
 	}
 
-    [Command]
-    private void CmdModArt(GameObject obj)
+
+    private void SetArtColor(Color color)
     {
-        //obj.GetComponent<NetworkIdentity>().AssignClientAuthority(connectionToClient);
-        obj.GetComponent<ArtPiece>().CmdSetColor(paintMats[Random.Range(0, paintMats.Length)].color);
-        //obj.GetComponent<NetworkIdentity>().RemoveClientAuthority(connectionToClient);
+        artColor = color;
+        ghost.GetComponentInChildren<Renderer>().material.color = new Color(color.r, color.g, color.b, 0.5f);
+        if(onColorChange != null)
+        {
+            onColorChange();
+        }
+    }
+
+    public Color GetArtColor()
+    {
+        return paints[paintIdx];
+    }
+
+
+    [Command]
+    private void CmdPaintArt(GameObject obj, Color color)
+    {
+        obj.GetComponent<ArtPiece>().CmdSetColor(color);
     }
 
     [Command]
-    private void CmdSpawnArt(Vector3 pos, Quaternion rot)
+    private void CmdSpawnArt(Vector3 pos, Quaternion rot, Color color)
     {
         GameObject art = Instantiate(prefab, pos, rot);
+        art.GetComponentInChildren<Renderer>().material.color = color;
+        //art.GetComponent<ArtPiece>().CmdSetColor(paints[paintIdx]);
+        //CmdPaintArt(art);
 
         NetworkServer.Spawn(art);
     }
