@@ -30,14 +30,18 @@ public class WorldMaker : MonoBehaviour
                     Chunk chunk = BuildChunk(chunkPos);
 
                     int chunkSize = Chunk.ChunkSize;
-                    bool[] blocks;
-                    blocks = new bool[chunkSize * chunkSize * chunkSize];
+                    int[] blocks;
+                    blocks = new int[chunkSize * chunkSize * chunkSize];
                     for (int i = 0; i < blocks.Length; ++i)
                     {
-                        //if (Random.Range(0, 5) == 0)
-                        //{
-                            blocks[i] = true;
-                        //}
+                        if (Random.Range(0, 2) == 0)
+                        {
+                            blocks[i] = 1;
+                        }
+                        else
+                        {
+                            blocks[i] = 2;
+                        }
                     }
 
                     chunk.SetBlocks(blocks);
@@ -57,7 +61,7 @@ public class WorldMaker : MonoBehaviour
         return script;
     }
     
-    public bool GetBlock(Vector3 pos)
+    public int GetBlock(Vector3 pos)
     {
         Vector3 chunkPos = pos / Chunk.ChunkSize;
         Chunk chunk;
@@ -68,7 +72,7 @@ public class WorldMaker : MonoBehaviour
         }
         else
         {
-            return false;
+            return -1;
         }
     }
 
@@ -87,7 +91,7 @@ public class WorldMaker : MonoBehaviour
         chunk.DestroyBlock(pos);
     }
 
-    public void AddBlock(Vector3 pos)
+    public void AddBlock(Vector3 pos, int type)
     {
         Vector3 chunkPos = pos / Chunk.ChunkSize;
         chunkPos.x = Mathf.Floor(chunkPos.x);
@@ -99,7 +103,7 @@ public class WorldMaker : MonoBehaviour
             chunk = BuildChunk(chunkPos);
         }
         pos = pos - chunkPos * Chunk.ChunkSize;
-        chunk.AddBlock(pos);
+        chunk.AddBlock(pos, type);
     }
 
 

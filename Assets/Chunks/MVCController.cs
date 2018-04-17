@@ -33,6 +33,8 @@ public class MVCController : MonoBehaviour {
 
     private float yvel = 0;
 
+    private int blockType = 1;
+
     
 	
 	void Update () {
@@ -94,7 +96,7 @@ public class MVCController : MonoBehaviour {
                 blockpos.x = Mathf.Floor(blockpos.x);
                 blockpos.y = Mathf.Floor(blockpos.y);
                 blockpos.z = Mathf.Floor(blockpos.z);
-                world.AddBlock(blockpos);
+                world.AddBlock(blockpos, blockType);
             }
         }
 
