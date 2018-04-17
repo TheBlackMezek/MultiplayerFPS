@@ -15,6 +15,13 @@ public class WorldMaker : MonoBehaviour
 
     private void Start()
     {
+        foreach(Vector3 v in cubeMesh.vertices)
+        {
+            Debug.Log(v);
+        }
+
+
+
         bool[] blocks = new bool[chunkSize * chunkSize * chunkSize];
 
         Vector3 chunkPos;
@@ -59,38 +66,38 @@ public class WorldMaker : MonoBehaviour
 
     public void BuildMesh(GameObject chunkObj, bool[] blocks)
     {
-        Vector3[] vertices;
-        int[] triangles;
-        Vector3[] normals;
-        Vector2[] uv;
+        List<Vector3> vertices;
+        List<int> triangles;
+        List<Vector3> normals;
+        List<Vector2> uv;
 
-        int blockCount = 0;
-        for (int x = 0; x < chunkSize; ++x)
-        {
-            for (int y = 0; y < chunkSize; ++y)
-            {
-                for (int z = 0; z < chunkSize; ++z)
-                {
-                    if (blocks[x + (y * chunkSize) + (z * chunkSize * chunkSize)])
-                    {
-                        ++blockCount;
-                    }
-                }
-            }
-        }
-        Debug.Log(blockCount);
-        int vertCont = cubeMesh.vertices.Length;
+        //int blockCount = 0;
+        //for (int x = 0; x < chunkSize; ++x)
+        //{
+        //    for (int y = 0; y < chunkSize; ++y)
+        //    {
+        //        for (int z = 0; z < chunkSize; ++z)
+        //        {
+        //            if (blocks[x + (y * chunkSize) + (z * chunkSize * chunkSize)])
+        //            {
+        //                ++blockCount;
+        //            }
+        //        }
+        //    }
+        //}
+        
+        int vertCount = cubeMesh.vertices.Length;
         int triCount = cubeMesh.triangles.Length;
-        int uvCount = cubeMesh.uv.Length;
-        int normCount = cubeMesh.normals.Length;
-
-        vertices = new Vector3[vertCont * blockCount];
-        triangles = new int[triCount * blockCount];
-        uv = new Vector2[uvCount * blockCount];
-        normals = new Vector3[normCount * blockCount];
+        int faceCount = vertCount / 4;
+        
+        vertices = new List<Vector3>();
+        triangles = new List<int>();
+        uv = new List<Vector2>();
+        normals = new List<Vector3>();
 
         Vector3 blockpos;
         int blockidx = 0;
+        int faces = 0;
         for (int z = 0; z < chunkSize; ++z)
         {
             for (int y = 0; y < chunkSize; ++y)
@@ -102,26 +109,63 @@ public class WorldMaker : MonoBehaviour
                         blockpos.x = x;
                         blockpos.y = y;
                         blockpos.z = z;
-
-                        for (int i = 0; i < vertCont; ++i)
+                        
+                        for(int i = 0; i < faceCount; ++i)
                         {
-                            vertices[i + vertCont * blockidx] = cubeMesh.vertices[i] + blockpos;
-                        }
+                            switch(i)
+                            {
+                                case 0: //front
+                                    if(z < chunkSize - 1
+                                    && blocks[x + (y * chunkSize) + ((z+1) * chunkSize * chunkSize)])
+                                    {
+                                        continue;
+                                    }
+                                    break;
+                                case 1: //back
+                                    if (z > 0
+                                    && blocks[x + (y * chunkSize) + ((z - 1) * chunkSize * chunkSize)])
+                                    {
+                                        continue;
+                                    }
+                                    break;
+                                case 2: //top
 
-                        for (int i = 0; i < triCount; ++i)
-                        {
-                            triangles[i + blockidx * triCount] = cubeMesh.triangles[i] + blockidx * vertCont;
-                        }
+                                    break;
+                                case 3: //bot
 
-                        for (int i = 0; i < uvCount; ++i)
-                        {
-                            uv[i + uvCount * blockidx] = cubeMesh.uv[i];
-                        }
+                                    break;
+                                case 4: //left
 
-                        for (int i = 0; i < normCount; ++i)
-                        {
-                            normals[i + normCount * blockidx] = cubeMesh.normals[i];
+                                    break;
+                                case 5: //right
+
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            for(int n = 0; n < 4; ++n)
+                            {
+                                vertices.Add(cubeMesh.vertices[n + i * 4] + blockpos);
+                                uv.Add(cubeMesh.uv[n + i * 4]);
+                                normals.Add(cubeMesh.normals[n + i * 4]);
+                            }
+                            for(int n = 0; n < 6; ++n)
+                            {
+                                triangles.Add(cubeMesh.triangles[n + i * 6] + blockidx * vertCount);
+                            }
                         }
+                        //for (int i = 0; i < vertCount; ++i)
+                        //{
+                        //    vertices.Add(cubeMesh.vertices[i] + blockpos);
+                        //    uv.Add(cubeMesh.uv[i]);
+                        //    normals.Add(cubeMesh.normals[i]);
+                        //}
+
+                        //for (int i = 0; i < triCount; ++i)
+                        //{
+                        //    triangles.Add(cubeMesh.triangles[i] + blockidx * vertCount);
+                        //}
 
                         ++blockidx;
                     }
@@ -132,10 +176,10 @@ public class WorldMaker : MonoBehaviour
 
         Mesh mesh = new Mesh();
         chunkObj.GetComponent<MeshFilter>().mesh = mesh;
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.normals = normals;
-        mesh.uv = uv;
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.normals = normals.ToArray();
+        mesh.uv = uv.ToArray();
         chunkObj.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
