@@ -151,6 +151,17 @@ public class Chunk : MonoBehaviour {
         }
     }
 
+    public void AddBlock(Vector3 pos)
+    {
+        if (pos.x >= 0 && pos.x < chunkSize
+        && pos.y >= 0 && pos.y < chunkSize
+        && pos.z >= 0 && pos.z < chunkSize)
+        {
+            blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = true;
+            BuildMesh();
+        }
+    }
+
     public void SetBlocks(bool[] b)
     {
         blocks = b;
