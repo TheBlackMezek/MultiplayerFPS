@@ -9,6 +9,13 @@ public class Chunk : MonoBehaviour {
     public MeshCollider collider;
 
     private static int chunkSize = 16;
+    public static int ChunkSize
+    {
+        get
+        {
+            return chunkSize;
+        }
+    }
 
     private bool[] blocks;
 
@@ -126,6 +133,22 @@ public class Chunk : MonoBehaviour {
     public bool GetBlock(int x, int y, int z)
     {
         return blocks[x + y * chunkSize + z * chunkSize * chunkSize];
+    }
+
+    public bool GetBlock(Vector3 pos)
+    {
+        return blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize];
+    }
+
+    public void DestroyBlock(Vector3 pos)
+    {
+        if(pos.x >= 0 && pos.x < chunkSize
+        && pos.y >= 0 && pos.y < chunkSize
+        && pos.z >= 0 && pos.z < chunkSize)
+        {
+            blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = false;
+            BuildMesh();
+        }
     }
 
     public void SetBlocks(bool[] b)

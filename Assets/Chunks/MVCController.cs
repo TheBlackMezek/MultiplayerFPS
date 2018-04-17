@@ -29,21 +29,48 @@ public class MVCController : MonoBehaviour {
     public CharacterController cc;
     public Transform avatar;
     public Transform camTrans;
+    public Camera cam;
 
     private float yvel = 0;
 
     
 	
 	void Update () {
+
         Cursor.lockState = CursorLockMode.Locked;
 
         MVCInput input = DoInput();
 
 
 
+        
+
+
+
         if(input.destroy)
         {
-
+            RaycastHit hit;
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit))
+            {
+                Vector3 blockpos = hit.point;
+                if(blockpos.x % 1.0 == 0 && ray.direction.x < 0)
+                {
+                    --blockpos.x;
+                }
+                if (blockpos.y % 1.0 == 0 && ray.direction.y < 0)
+                {
+                    --blockpos.y;
+                }
+                if (blockpos.z % 1.0 == 0 && ray.direction.z < 0)
+                {
+                    --blockpos.z;
+                }
+                blockpos.x = Mathf.Floor(blockpos.x);
+                blockpos.y = Mathf.Floor(blockpos.y);
+                blockpos.z = Mathf.Floor(blockpos.z);
+                world.DestroyBlock(blockpos);
+            }
         }
 
 
