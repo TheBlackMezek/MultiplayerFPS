@@ -19,6 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4560367597702404}
+  - component: {fileID: 114764878851001952}
   - component: {fileID: 33906876440287708}
   - component: {fileID: 23577527064810822}
   - component: {fileID: 64192496069589900}
@@ -95,3 +96,17 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 0}
+--- !u!114 &114764878851001952
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1362487719053886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7b88629342bf094480e6c0257f18aec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cubeModel: {fileID: 11400000, guid: 2199a25564d708f4e80b4e6dc5c5394b, type: 2}
+  filter: {fileID: 33906876440287708}
+  collider: {fileID: 64192496069589900}

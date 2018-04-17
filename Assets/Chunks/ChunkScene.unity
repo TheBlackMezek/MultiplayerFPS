@@ -508,6 +508,7 @@ MonoBehaviour:
   gravForce: 10
   camSensitivity: 75
   interactRange: 5
+  world: {fileID: 0}
   cc: {fileID: 88308408}
   avatar: {fileID: 88308404}
   camTrans: {fileID: 1272797469}

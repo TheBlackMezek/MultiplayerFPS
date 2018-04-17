@@ -56,14 +56,8 @@ public class WorldMaker : MonoBehaviour
 
     private void Start()
     {
-        foreach(Vector3 v in cubeNormal)
-        {
-            //Debug.Log(v);
-        }
 
-
-
-        bool[] blocks;// = new bool[chunkSize * chunkSize * chunkSize];
+        bool[] blocks;
         int counter = 0;
         Vector3 chunkPos;
         for(int x = 0; x < worldSize; ++x)
@@ -97,7 +91,8 @@ public class WorldMaker : MonoBehaviour
     {
         GameObject chunk = Instantiate(chunkPrefab);
         chunk.transform.position = pos * chunkSize;
-        BuildMesh(chunk, blocks);
+        chunk.GetComponent<Chunk>().SetBlocks(blocks);
+        //BuildMesh(chunk, blocks);
         return chunk;
     }
 
@@ -215,5 +210,7 @@ public class WorldMaker : MonoBehaviour
     {
         return blocks[x + y * chunkSize + z * chunkSize * chunkSize];
     }
+
+
 
 }

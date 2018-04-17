@@ -11,6 +11,8 @@ public struct MVCInput
     public float rotYaw;
 
     public bool jump;
+    public bool destroy;
+    public bool place;
 }
 
 
@@ -22,6 +24,8 @@ public class MVCController : MonoBehaviour {
     public float camSensitivity;
     public float interactRange;
 
+
+    public WorldMaker world;
     public CharacterController cc;
     public Transform avatar;
     public Transform camTrans;
@@ -34,6 +38,13 @@ public class MVCController : MonoBehaviour {
         Cursor.lockState = CursorLockMode.Locked;
 
         MVCInput input = DoInput();
+
+
+
+        if(input.destroy)
+        {
+
+        }
 
 
 
@@ -71,6 +82,8 @@ public class MVCController : MonoBehaviour {
         input.rotPitch = camSensitivity * Time.deltaTime * -Input.GetAxis("Mouse Y");
         input.rotYaw = camSensitivity * Time.deltaTime * Input.GetAxis("Mouse X");
         input.jump = Input.GetAxis("Jump") > 0;
+        input.destroy = Input.GetMouseButtonDown(0);
+        input.place = Input.GetMouseButtonDown(1);
         return input;
     }
 
