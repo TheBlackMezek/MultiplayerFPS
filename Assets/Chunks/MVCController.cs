@@ -22,6 +22,8 @@ public class MVCController : MonoBehaviour {
     public float jumpForce;
     public float gravForce;
     public float camSensitivity;
+    public float camPitchClamp1 = 271.0f;
+    public float camPitchClamp2 = 89.0f;
     public float interactRange;
 
 
@@ -124,7 +126,22 @@ public class MVCController : MonoBehaviour {
         cc.Move(moveVec);
 
         avatar.eulerAngles += Vector3.up * input.rotYaw;
-        camTrans.eulerAngles += Vector3.right * input.rotPitch;
+        Vector3 camAng = camTrans.eulerAngles;
+        camAng += Vector3.right * input.rotPitch;
+        //camAng.x += 180.0f;
+        if(camAng.x > 180.0f)
+        {
+            camAng.x = Mathf.Clamp(camAng.x, camPitchClamp1, 360.0f);
+        }
+        else if(camAng.x < 10.0f)
+        {
+            camAng.x = Mathf.Clamp(camAng.x, -10.0f, 10.0f);
+        }
+        else
+        {
+            camAng.x = Mathf.Clamp(camAng.x, 0.0f, camPitchClamp2);
+        }
+        camTrans.eulerAngles = camAng;
 
 	}
 
