@@ -8,7 +8,7 @@ public class Chunk : MonoBehaviour {
     public MeshFilter filter;
     public MeshCollider collider;
 
-    private static int chunkSize = 16;
+    private static int chunkSize = 8;
     public static int ChunkSize
     {
         get

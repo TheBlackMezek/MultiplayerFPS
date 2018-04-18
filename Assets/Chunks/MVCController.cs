@@ -10,6 +10,8 @@ public struct MVCInput
     public float rotPitch;
     public float rotYaw;
 
+    public int blockTypeChange;
+
     public bool jump;
     public bool destroy;
     public bool place;
@@ -36,6 +38,7 @@ public class MVCController : MonoBehaviour {
     private float yvel = 0;
 
     private int blockType = 1;
+    private int numOfBlockTypes = 2;
 
     
 	
@@ -47,7 +50,15 @@ public class MVCController : MonoBehaviour {
 
 
 
-        
+        blockType += input.blockTypeChange;
+        if(blockType > numOfBlockTypes)
+        {
+            blockType = 1;
+        }
+        else if(blockType < 1)
+        {
+            blockType = numOfBlockTypes;
+        }
 
 
 
@@ -55,7 +66,7 @@ public class MVCController : MonoBehaviour {
         {
             RaycastHit hit;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, interactRange))
             {
                 Vector3 blockpos = hit.point;
                 if(blockpos.x % 1.0 == 0 && ray.direction.x < 0)
@@ -80,7 +91,7 @@ public class MVCController : MonoBehaviour {
         {
             RaycastHit hit;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, interactRange))
             {
                 Vector3 blockpos = hit.point;
                 if (blockpos.x % 1.0 == 0 && ray.direction.x > 0)
@@ -128,7 +139,6 @@ public class MVCController : MonoBehaviour {
         avatar.eulerAngles += Vector3.up * input.rotYaw;
         Vector3 camAng = camTrans.eulerAngles;
         camAng += Vector3.right * input.rotPitch;
-        //camAng.x += 180.0f;
         if(camAng.x > 180.0f)
         {
             camAng.x = Mathf.Clamp(camAng.x, camPitchClamp1, 360.0f);
@@ -150,8 +160,21 @@ public class MVCController : MonoBehaviour {
         MVCInput input;
         input.moveX = moveSpeed * Time.deltaTime * Input.GetAxis("Horizontal");
         input.moveZ = moveSpeed * Time.deltaTime * Input.GetAxis("Vertical");
+
         input.rotPitch = camSensitivity * Time.deltaTime * -Input.GetAxis("Mouse Y");
         input.rotYaw = camSensitivity * Time.deltaTime * Input.GetAxis("Mouse X");
+
+        input.blockTypeChange = 0;
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if(scroll > 0)
+        {
+            input.blockTypeChange = 1;
+        }
+        else if(scroll < 0)
+        {
+            input.blockTypeChange = -1;
+        }
+
         input.jump = Input.GetAxis("Jump") > 0;
         input.destroy = Input.GetMouseButtonDown(0);
         input.place = Input.GetMouseButtonDown(1);
