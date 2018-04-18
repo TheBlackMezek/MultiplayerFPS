@@ -8,7 +8,11 @@ public class WGPerlin : WorldGenAbstract
 
     public int groundStart;
     public float heightScale;
-    public float frequency;
+    public float baseFrequency;
+
+    public int octaves = 1;
+    public float persistence;
+    public float lacunarity;
 
 
 
@@ -34,13 +38,16 @@ public class WGPerlin : WorldGenAbstract
             {
                 Vector2 blockpos = new Vector2(chunk.transform.position.x + x,
                                                chunk.transform.position.z + z);
-                blockpos /= frequency;
-                float height = Mathf.PerlinNoise(blockpos.x, blockpos.y) * heightScale;
+                float height = UsePerlin(blockpos);
                 for (int y = 0; y < Chunk.ChunkSize; ++y)
                 {
-                    if(y + chunk.transform.position.y - groundStart <= height)
+                    if(y + chunk.transform.position.y - groundStart <= height-1)
                     {
                         blocks[x + y * Chunk.ChunkSize + z * Chunk.ChunkSize * Chunk.ChunkSize] = 1;
+                    }
+                    else if (y + chunk.transform.position.y - groundStart <= height)
+                    {
+                        blocks[x + y * Chunk.ChunkSize + z * Chunk.ChunkSize * Chunk.ChunkSize] = 2;
                     }
                     else
                     {
@@ -51,6 +58,24 @@ public class WGPerlin : WorldGenAbstract
         }
 
         chunk.SetBlocks(blocks);
+    }
+
+    private float UsePerlin(Vector2 blockpos)
+    {
+        float height = 0;
+
+        float frequency = baseFrequency;
+        float amplitude = heightScale;
+
+        for(int i = 0; i < octaves; ++i)
+        {
+            height += Mathf.PerlinNoise(blockpos.x * frequency, blockpos.y * frequency) * amplitude;
+
+            amplitude *= persistence;
+            frequency *= lacunarity;
+        }
+
+        return height;
     }
 
 }

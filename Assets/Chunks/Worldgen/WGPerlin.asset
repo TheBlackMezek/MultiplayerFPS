@@ -13,4 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundStart: 0
   heightScale: 50
-  frequency: 50
+  baseFrequency: 0.005
+  octaves: 5
+  persistence: 0.5
+  lacunarity: 2
