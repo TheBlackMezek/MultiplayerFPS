@@ -68,6 +68,11 @@ public class MVCController : MonoBehaviour {
             blockType = numOfBlockTypes;
         }
 
+        if(input.blockTypeChange != 0)
+        {
+            UIBridge.Instance.OnBlockSelectionChange(blockType);
+        }
+
 
 
         if(input.destroy)
