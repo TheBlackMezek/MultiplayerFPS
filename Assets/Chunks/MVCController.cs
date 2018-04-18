@@ -40,9 +40,17 @@ public class MVCController : MonoBehaviour {
     private int blockType = 1;
     private int numOfBlockTypes = 2;
 
-    
-	
-	void Update () {
+    public delegate void colliderHitHack(ControllerColliderHit hit);
+    public colliderHitHack ColliderHitHack;
+
+
+
+    private void Awake()
+    {
+        ColliderHitHack = onControllerColliderHit;
+    }
+
+    void Update () {
 
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -174,11 +182,19 @@ public class MVCController : MonoBehaviour {
         {
             input.blockTypeChange = -1;
         }
-
+        
         input.jump = Input.GetAxis("Jump") > 0;
         input.destroy = Input.GetMouseButtonDown(0);
         input.place = Input.GetMouseButtonDown(1);
         return input;
+    }
+
+    private void onControllerColliderHit(ControllerColliderHit hit)
+    {
+        if(hit.normal.y < 0 && yvel > 0)
+        {
+            yvel = 0;
+        }
     }
 
 }
