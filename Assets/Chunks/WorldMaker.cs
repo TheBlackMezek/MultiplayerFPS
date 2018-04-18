@@ -30,23 +30,6 @@ public class WorldMaker : MonoBehaviour
                     chunkPos.z = z;
                     Chunk chunk = BuildChunk(chunkPos);
                     generator.BuildChunk(chunk);
-
-                    //int chunkSize = Chunk.ChunkSize;
-                    //int[] blocks;
-                    //blocks = new int[chunkSize * chunkSize * chunkSize];
-                    //for (int i = 0; i < blocks.Length; ++i)
-                    //{
-                    //    if (Random.Range(0, 2) == 0)
-                    //    {
-                    //        blocks[i] = 1;
-                    //    }
-                    //    else
-                    //    {
-                    //        blocks[i] = 2;
-                    //    }
-                    //}
-                    //
-                    //chunk.SetBlocks(blocks);
                 }
             }
         }

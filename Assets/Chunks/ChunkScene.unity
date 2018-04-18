@@ -516,8 +516,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 1362487719053886, guid: a640a48e6d26ac14b9b7ded198442f34,
     type: 2}
-  worldSize: 6
-  generator: {fileID: 11400000, guid: 6cd32a7af6be1e34892eb271563447c1, type: 2}
+  worldSize: 10
+  generator: {fileID: 11400000, guid: 0988b6254320f9f4eb41aca4812072e6, type: 2}
 --- !u!1 &1755129339
 GameObject:
   m_ObjectHideFlags: 0
