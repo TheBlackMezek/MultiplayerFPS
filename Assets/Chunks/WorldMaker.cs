@@ -8,6 +8,7 @@ public class WorldMaker : MonoBehaviour
     public GameObject chunkPrefab;
     
     public int worldSize = 3;
+    public WorldGenAbstract generator;
 
     private Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
     
@@ -28,23 +29,24 @@ public class WorldMaker : MonoBehaviour
                     chunkPos.y = y;
                     chunkPos.z = z;
                     Chunk chunk = BuildChunk(chunkPos);
+                    generator.BuildChunk(chunk);
 
-                    int chunkSize = Chunk.ChunkSize;
-                    int[] blocks;
-                    blocks = new int[chunkSize * chunkSize * chunkSize];
-                    for (int i = 0; i < blocks.Length; ++i)
-                    {
-                        if (Random.Range(0, 2) == 0)
-                        {
-                            blocks[i] = 1;
-                        }
-                        else
-                        {
-                            blocks[i] = 2;
-                        }
-                    }
-
-                    chunk.SetBlocks(blocks);
+                    //int chunkSize = Chunk.ChunkSize;
+                    //int[] blocks;
+                    //blocks = new int[chunkSize * chunkSize * chunkSize];
+                    //for (int i = 0; i < blocks.Length; ++i)
+                    //{
+                    //    if (Random.Range(0, 2) == 0)
+                    //    {
+                    //        blocks[i] = 1;
+                    //    }
+                    //    else
+                    //    {
+                    //        blocks[i] = 2;
+                    //    }
+                    //}
+                    //
+                    //chunk.SetBlocks(blocks);
                 }
             }
         }
