@@ -174,8 +174,8 @@ public class MVCController : MonoBehaviour {
         input.moveX = moveSpeed * Time.deltaTime * Input.GetAxis("Horizontal");
         input.moveZ = moveSpeed * Time.deltaTime * Input.GetAxis("Vertical");
 
-        input.rotPitch = camSensitivity * Time.deltaTime * -Input.GetAxis("Mouse Y");
-        input.rotYaw = camSensitivity * Time.deltaTime * Input.GetAxis("Mouse X");
+        input.rotPitch = camSensitivity * -Input.GetAxis("Mouse Y");
+        input.rotYaw = camSensitivity * Input.GetAxis("Mouse X");
 
         input.blockTypeChange = 0;
         float scroll = Input.GetAxis("Mouse ScrollWheel");
