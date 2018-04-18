@@ -196,7 +196,7 @@ public class MVCController : MonoBehaviour {
 
     private void onControllerColliderHit(ControllerColliderHit hit)
     {
-        if(hit.normal.y < 0 && yvel > 0)
+        if(hit.normal.y == -1.0f && yvel > 0)
         {
             yvel = 0;
         }

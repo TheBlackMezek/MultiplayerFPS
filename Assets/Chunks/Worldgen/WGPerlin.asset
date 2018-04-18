@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cd824f6ebb98054296c0ddcd3032a24, type: 3}
   m_Name: WGPerlin
   m_EditorClassIdentifier: 
-  groundStart: 10
-  heightScale: 10
-  frequency: 10
+  groundStart: 0
+  heightScale: 50
+  frequency: 50
