@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Chunk : MonoBehaviour {
+public class Chunk : NetworkBehaviour {
 
     public CubeModel cubeModel;
     public MeshFilter filter;
@@ -149,9 +150,35 @@ public class Chunk : MonoBehaviour {
 
     public void DestroyBlock(Vector3 pos)
     {
-        if(pos.x >= 0 && pos.x < chunkSize
-        && pos.y >= 0 && pos.y < chunkSize
-        && pos.z >= 0 && pos.z < chunkSize)
+        if (pos.x >= 0 && pos.x < chunkSize
+         && pos.y >= 0 && pos.y < chunkSize
+         && pos.z >= 0 && pos.z < chunkSize)
+        {
+            blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = 0;
+            BuildMesh();
+        }
+    }
+
+    [Command]
+    public void CmdDestroyBlock(Vector3 pos)
+    {
+        if (pos.x >= 0 && pos.x < chunkSize
+         && pos.y >= 0 && pos.y < chunkSize
+         && pos.z >= 0 && pos.z < chunkSize)
+        {
+            blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = 0;
+            BuildMesh();
+            RpcDestroyBlock(pos);
+        }
+    }
+
+    [ClientRpc]
+    public void RpcDestroyBlock(Vector3 pos)
+    {
+        if (!isServer
+         && pos.x >= 0 && pos.x < chunkSize
+         && pos.y >= 0 && pos.y < chunkSize
+         && pos.z >= 0 && pos.z < chunkSize)
         {
             blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = 0;
             BuildMesh();
@@ -161,8 +188,8 @@ public class Chunk : MonoBehaviour {
     public void AddBlock(Vector3 pos, int type)
     {
         if (pos.x >= 0 && pos.x < chunkSize
-        && pos.y >= 0 && pos.y < chunkSize
-        && pos.z >= 0 && pos.z < chunkSize)
+         && pos.y >= 0 && pos.y < chunkSize
+         && pos.z >= 0 && pos.z < chunkSize)
         {
             blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = type;
             BuildMesh();

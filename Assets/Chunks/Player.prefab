@@ -39,6 +39,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4155069321538010}
   - component: {fileID: 114980144252319806}
+  - component: {fileID: 114311961510412508}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -85,7 +86,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1981326023096712}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.29, y: 200, z: 9.58}
+  m_LocalPosition: {x: 29.264708, y: 37.40718, z: 19.386984}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4361723706932594}
@@ -137,11 +138,11 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!23 &23733222755711868
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -151,6 +152,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -166,6 +168,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -195,6 +198,38 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1999633992902744}
   m_Enabled: 1
+--- !u!114 &114311961510412508
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1981326023096712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 158
+    i1: 139
+    i2: 46
+    i3: 109
+    i4: 130
+    i5: 178
+    i6: 131
+    i7: 116
+    i8: 8
+    i9: 241
+    i10: 18
+    i11: 99
+    i12: 218
+    i13: 62
+    i14: 40
+    i15: 251
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!114 &114483065055348124
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -225,11 +260,11 @@ MonoBehaviour:
   camPitchClamp1: 271
   camPitchClamp2: 89
   interactRange: 5
-  world: {fileID: 0}
   cc: {fileID: 143309372197380216}
   avatar: {fileID: 4361723706932594}
   camTrans: {fileID: 4072520911303466}
   cam: {fileID: 20443399707956526}
+  ls: {fileID: 81940828094692218}
 --- !u!124 &124742289908412468
 Behaviour:
   m_ObjectHideFlags: 1

@@ -6,5 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Chunks/ChunkOffline.unity
+    guid: 4f9532fafa08d784fa73960e09e83d89
+  - enabled: 1
     path: Assets/Chunks/ChunkScene.unity
     guid: 9f70f63b731e3ec4499dec88fb07f2f5

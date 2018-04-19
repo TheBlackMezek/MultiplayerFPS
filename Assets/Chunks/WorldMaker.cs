@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class WorldMaker : MonoBehaviour
+public class WorldMaker : NetworkBehaviour
 {
     
     public GameObject chunkPrefab;
@@ -14,10 +15,15 @@ public class WorldMaker : MonoBehaviour
     private Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
     private Vector3[] chunksToBuild;
     private int queuedChunk = 0;
-    
-    
 
 
+
+
+
+    private void Awake()
+    {
+        NetBridge.Instance.world = this;
+    }
 
     private void Start()
     {
@@ -84,6 +90,43 @@ public class WorldMaker : MonoBehaviour
 
     public void DestroyBlock(Vector3 pos)
     {
+        Vector3 chunkPos = pos / Chunk.ChunkSize;
+        chunkPos.x = Mathf.Floor(chunkPos.x);
+        chunkPos.y = Mathf.Floor(chunkPos.y);
+        chunkPos.z = Mathf.Floor(chunkPos.z);
+        Chunk chunk;
+        if (!chunks.TryGetValue(chunkPos, out chunk))
+        {
+            chunk = BuildChunk(chunkPos).GetComponent<Chunk>();
+        }
+        pos = pos - chunkPos * Chunk.ChunkSize;
+        chunk.DestroyBlock(pos);
+    }
+
+    [Command]
+    public void CmdDestroyBlock(Vector3 pos)
+    {
+        Vector3 chunkPos = pos / Chunk.ChunkSize;
+        chunkPos.x = Mathf.Floor(chunkPos.x);
+        chunkPos.y = Mathf.Floor(chunkPos.y);
+        chunkPos.z = Mathf.Floor(chunkPos.z);
+        Chunk chunk;
+        if (!chunks.TryGetValue(chunkPos, out chunk))
+        {
+            chunk = BuildChunk(chunkPos).GetComponent<Chunk>();
+        }
+        pos = pos - chunkPos * Chunk.ChunkSize;
+        chunk.DestroyBlock(pos);
+        RpcDestroyBlock(pos);
+    }
+
+    [ClientRpc]
+    public void RpcDestroyBlock(Vector3 pos)
+    {
+        if(isServer)
+        {
+            return;
+        }
         Vector3 chunkPos = pos / Chunk.ChunkSize;
         chunkPos.x = Mathf.Floor(chunkPos.x);
         chunkPos.y = Mathf.Floor(chunkPos.y);

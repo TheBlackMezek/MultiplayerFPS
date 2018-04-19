@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public struct MVCInput
 {
@@ -18,7 +19,7 @@ public struct MVCInput
 }
 
 
-public class MVCController : MonoBehaviour {
+public class MVCController : NetworkBehaviour {
 
     public float moveSpeed;
     public float jumpForce;
@@ -29,16 +30,17 @@ public class MVCController : MonoBehaviour {
     public float interactRange;
 
 
-    public WorldMaker world;
     public CharacterController cc;
     public Transform avatar;
     public Transform camTrans;
     public Camera cam;
+    public AudioListener ls;
 
     private float yvel = 0;
-
     private int blockType = 1;
     private int numOfBlockTypes = 2;
+
+    private WorldMaker world;
 
     public delegate void colliderHitHack(ControllerColliderHit hit);
     public colliderHitHack ColliderHitHack;
@@ -48,10 +50,25 @@ public class MVCController : MonoBehaviour {
     private void Awake()
     {
         ColliderHitHack = onControllerColliderHit;
+    }
+
+    private void Start()
+    {
+        world = NetBridge.Instance.world;
         transform.position = world.GetPlayerSpawn();
+
+        if (!isLocalPlayer)
+        {
+            cam.enabled = false;
+            ls.enabled = false;
+        }
     }
 
     void Update () {
+        if(!isLocalPlayer)
+        {
+            return;
+        }
 
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -98,7 +115,7 @@ public class MVCController : MonoBehaviour {
                 blockpos.x = Mathf.Floor(blockpos.x);
                 blockpos.y = Mathf.Floor(blockpos.y);
                 blockpos.z = Mathf.Floor(blockpos.z);
-                world.DestroyBlock(blockpos);
+                world.CmdDestroyBlock(blockpos);
             }
         }
         if(input.place)
