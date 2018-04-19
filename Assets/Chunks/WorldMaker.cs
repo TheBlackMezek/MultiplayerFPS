@@ -8,9 +8,12 @@ public class WorldMaker : MonoBehaviour
     public GameObject chunkPrefab;
     
     public int worldSize = 3;
+    public int chunksGennedPerFrame;
     public WorldGenAbstract generator;
 
     private Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
+    private Vector3[] chunksToBuild;
+    private int queuedChunk = 0;
     
     
 
@@ -18,6 +21,9 @@ public class WorldMaker : MonoBehaviour
 
     private void Start()
     {
+        chunksToBuild = new Vector3[worldSize * worldSize * worldSize];
+
+        int iterator = 0;
         Vector3 chunkPos;
         for (int x = 0; x < worldSize; ++x)
         {
@@ -28,12 +34,27 @@ public class WorldMaker : MonoBehaviour
                     chunkPos.x = x;
                     chunkPos.y = y;
                     chunkPos.z = z;
-                    Chunk chunk = BuildChunk(chunkPos);
-                    generator.BuildChunk(chunk);
+                    chunksToBuild[iterator] = chunkPos;
+                    ++iterator;
+                    //Chunk chunk = BuildChunk(chunkPos);
+                    //generator.BuildChunk(chunk);
                 }
             }
         }
 
+    }
+
+    private void Update()
+    {
+        if(queuedChunk < chunksToBuild.Length)
+        {
+            for(int i = 0; i < chunksGennedPerFrame && queuedChunk < chunksToBuild.Length; ++i)
+            {
+                Chunk chunk = BuildChunk(chunksToBuild[queuedChunk]);
+                generator.BuildChunk(chunk);
+                ++queuedChunk;
+            }
+        }
     }
 
 
@@ -89,6 +110,11 @@ public class WorldMaker : MonoBehaviour
         }
         pos = pos - chunkPos * Chunk.ChunkSize;
         chunk.AddBlock(pos, type);
+    }
+
+    public Vector3 GetPlayerSpawn()
+    {
+        return new Vector3(0, worldSize * Chunk.ChunkSize, 0);
     }
 
 

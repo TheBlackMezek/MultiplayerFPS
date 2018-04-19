@@ -48,6 +48,7 @@ public class MVCController : MonoBehaviour {
     private void Awake()
     {
         ColliderHitHack = onControllerColliderHit;
+        transform.position = world.GetPlayerSpawn();
     }
 
     void Update () {
