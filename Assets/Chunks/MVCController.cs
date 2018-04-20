@@ -18,6 +18,20 @@ public struct MVCInput
     public bool place;
 }
 
+public struct MVCState
+{
+    public int id;
+    public Vector3 pos;
+    public Vector3 euler;
+    public float yvel;
+}
+
+public struct MVCInputPacket
+{
+    public int id;
+    public MVCInput[] inputs;
+}
+
 
 public class MVCController : NetworkBehaviour {
 
@@ -28,19 +42,25 @@ public class MVCController : NetworkBehaviour {
     public float camPitchClamp1 = 271.0f;
     public float camPitchClamp2 = 89.0f;
     public float interactRange;
-
-
+    
     public CharacterController cc;
     public Transform avatar;
     public Transform camTrans;
     public Camera cam;
     public AudioListener ls;
 
+
     private float yvel = 0;
     private int blockType = 1;
     private int numOfBlockTypes = 2;
 
     private WorldMaker world;
+
+    private MVCState lastVerifiedState;
+    private List<MVCInput> inputs = new List<MVCInput>();
+    private int packetId = 0;
+    private int packetIdCap = 10000;
+    private List<MVCInputPacket> sentPackets = new List<MVCInputPacket>();
 
     public delegate void colliderHitHack(ControllerColliderHit hit);
     public colliderHitHack ColliderHitHack;
@@ -62,6 +82,13 @@ public class MVCController : NetworkBehaviour {
             cam.enabled = false;
             ls.enabled = false;
         }
+        else
+        {
+            lastVerifiedState.pos = transform.position;
+            lastVerifiedState.euler = transform.eulerAngles;
+            lastVerifiedState.yvel = yvel;
+            lastVerifiedState.id = packetId;
+        }
     }
 
     void Update () {
@@ -72,7 +99,9 @@ public class MVCController : NetworkBehaviour {
 
         Cursor.lockState = CursorLockMode.Locked;
 
-        MVCInput input = DoInput();
+        MVCInput input = GetInput();
+        inputs.Add(input);
+        ProcessInputAndMotion(input);
 
 
 
@@ -144,49 +173,37 @@ public class MVCController : NetworkBehaviour {
             }
         }
 
-
-
-        if (!cc.isGrounded)
-        {
-            yvel -= gravForce * Time.deltaTime;
-        }
-        else if (input.jump)
-        {
-            yvel = jumpForce;
-        }
-        else
-        {
-            yvel = 0;
-        }
-
-        float ymove = yvel * Time.deltaTime;
-
-        Vector3 moveVec = avatar.up * ymove;
-        moveVec += avatar.right * input.moveX;
-        moveVec += avatar.forward * input.moveZ;
-
-        cc.Move(moveVec);
-
-        avatar.eulerAngles += Vector3.up * input.rotYaw;
-        Vector3 camAng = camTrans.eulerAngles;
-        camAng += Vector3.right * input.rotPitch;
-        if(camAng.x > 180.0f)
-        {
-            camAng.x = Mathf.Clamp(camAng.x, camPitchClamp1, 360.0f);
-        }
-        else if(camAng.x < 10.0f)
-        {
-            camAng.x = Mathf.Clamp(camAng.x, -10.0f, 10.0f);
-        }
-        else
-        {
-            camAng.x = Mathf.Clamp(camAng.x, 0.0f, camPitchClamp2);
-        }
-        camTrans.eulerAngles = camAng;
-
 	}
 
-    private MVCInput DoInput()
+    private void FixedUpdate()
+    {
+        if(isServer)
+        {
+            if(isLocalPlayer)
+            {
+                lastVerifiedState.pos = transform.position;
+                lastVerifiedState.euler = transform.eulerAngles;
+                lastVerifiedState.yvel = yvel;
+                RpcReconcileState(lastVerifiedState);
+            }
+            return;
+        }
+        MVCInputPacket packet;
+        packet.id = packetId;
+        packet.inputs = inputs.ToArray();
+        inputs.Clear();
+
+        CmdVerifyInputs(packet);
+        sentPackets.Add(packet);
+        
+        ++packetId;
+        if(packetId > packetIdCap)
+        {
+            packetId = 0;
+        }
+    }
+
+    private MVCInput GetInput()
     {
         MVCInput input;
         input.moveX = moveSpeed * Time.deltaTime * Input.GetAxis("Horizontal");
@@ -210,6 +227,88 @@ public class MVCController : NetworkBehaviour {
         input.destroy = Input.GetMouseButtonDown(0);
         input.place = Input.GetMouseButtonDown(1);
         return input;
+    }
+
+    private void ProcessInputAndMotion(MVCInput input)
+    {
+        if (!cc.isGrounded)
+        {
+            yvel -= gravForce * Time.deltaTime;
+        }
+        else if (input.jump)
+        {
+            yvel = jumpForce;
+        }
+        else
+        {
+            yvel = 0;
+        }
+
+        Vector3 move = avatar.up * yvel * Time.deltaTime;
+        move += avatar.forward * input.moveZ;
+        move += avatar.right * input.moveX;
+        cc.Move(move);
+
+
+
+        avatar.eulerAngles += Vector3.up * input.rotYaw;
+        Vector3 camAng = camTrans.eulerAngles;
+        camAng += Vector3.right * input.rotPitch;
+        if (camAng.x > 180.0f)
+        {
+            camAng.x = Mathf.Clamp(camAng.x, camPitchClamp1, 360.0f);
+        }
+        else if (camAng.x < 10.0f)
+        {
+            camAng.x = Mathf.Clamp(camAng.x, -10.0f, 10.0f);
+        }
+        else
+        {
+            camAng.x = Mathf.Clamp(camAng.x, 0.0f, camPitchClamp2);
+        }
+        camTrans.eulerAngles = camAng;
+    }
+
+    [Command]
+    private void CmdVerifyInputs(MVCInputPacket packet)
+    {
+        foreach (MVCInput input in packet.inputs)
+        {
+            ProcessInputAndMotion(input);
+        }
+        MVCState state;
+        state.id = packet.id;
+        state.pos = transform.position;
+        state.euler = transform.eulerAngles;
+        state.yvel = yvel;
+        RpcReconcileState(state);
+    }
+
+    [ClientRpc]
+    private void RpcReconcileState(MVCState state)
+    {
+        for(int i = 0; i < sentPackets.Count; ++i)
+        {
+            if(sentPackets[i].id == state.id)
+            {
+                sentPackets.RemoveRange(0, i + 1);
+                break;
+            }
+        }
+
+        lastVerifiedState = state;
+
+        transform.position = state.pos;
+        transform.eulerAngles = state.euler;
+        yvel = state.yvel;
+
+        foreach(MVCInputPacket packet in sentPackets)
+        {
+            foreach(MVCInput input in packet.inputs)
+            {
+                ProcessInputAndMotion(input);
+            }
+        }
     }
 
     private void onControllerColliderHit(ControllerColliderHit hit)
