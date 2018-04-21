@@ -128,58 +128,8 @@ public class MVCController : NetworkBehaviour {
         }
 
 
-
-        if(input.destroy)
-        {
-            RaycastHit hit;
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, interactRange))
-            {
-                Vector3 blockpos = hit.point;
-                if(blockpos.x % 1.0 == 0 && ray.direction.x < 0)
-                {
-                    --blockpos.x;
-                }
-                if (blockpos.y % 1.0 == 0 && ray.direction.y < 0)
-                {
-                    --blockpos.y;
-                }
-                if (blockpos.z % 1.0 == 0 && ray.direction.z < 0)
-                {
-                    --blockpos.z;
-                }
-                blockpos.x = Mathf.Floor(blockpos.x);
-                blockpos.y = Mathf.Floor(blockpos.y);
-                blockpos.z = Mathf.Floor(blockpos.z);
-                world.CmdDestroyBlock(blockpos);
-            }
-        }
-        if(input.place)
-        {
-            RaycastHit hit;
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, interactRange))
-            {
-                Vector3 blockpos = hit.point;
-                if (blockpos.x % 1.0 == 0 && ray.direction.x > 0)
-                {
-                    --blockpos.x;
-                }
-                if (blockpos.y % 1.0 == 0 && ray.direction.y > 0)
-                {
-                    --blockpos.y;
-                }
-                if (blockpos.z % 1.0 == 0 && ray.direction.z > 0)
-                {
-                    --blockpos.z;
-                }
-                blockpos.x = Mathf.Floor(blockpos.x);
-                blockpos.y = Mathf.Floor(blockpos.y);
-                blockpos.z = Mathf.Floor(blockpos.z);
-                world.AddBlock(blockpos, blockType);
-            }
-        }
-
+        ProcessInteractionInput(input);
+        
 	}
 
     private void FixedUpdate()
@@ -285,6 +235,60 @@ public class MVCController : NetworkBehaviour {
         camTrans.eulerAngles = camAng;
     }
 
+    private void ProcessInteractionInput(MVCInput input)
+    {
+        if (input.destroy)
+        {
+            RaycastHit hit;
+            Ray ray = new Ray(camTrans.position, camTrans.forward);
+            if (Physics.Raycast(ray, out hit, interactRange))
+            {
+                Vector3 blockpos = hit.point;
+                if (blockpos.x % 1.0 == 0 && ray.direction.x < 0)
+                {
+                    --blockpos.x;
+                }
+                if (blockpos.y % 1.0 == 0 && ray.direction.y < 0)
+                {
+                    --blockpos.y;
+                }
+                if (blockpos.z % 1.0 == 0 && ray.direction.z < 0)
+                {
+                    --blockpos.z;
+                }
+                blockpos.x = Mathf.Floor(blockpos.x);
+                blockpos.y = Mathf.Floor(blockpos.y);
+                blockpos.z = Mathf.Floor(blockpos.z);
+                world.DestroyBlock(blockpos);
+            }
+        }
+        if (input.place)
+        {
+            RaycastHit hit;
+            Ray ray = new Ray(camTrans.position, camTrans.forward);
+            if (Physics.Raycast(ray, out hit, interactRange))
+            {
+                Vector3 blockpos = hit.point;
+                if (blockpos.x % 1.0 == 0 && ray.direction.x > 0)
+                {
+                    --blockpos.x;
+                }
+                if (blockpos.y % 1.0 == 0 && ray.direction.y > 0)
+                {
+                    --blockpos.y;
+                }
+                if (blockpos.z % 1.0 == 0 && ray.direction.z > 0)
+                {
+                    --blockpos.z;
+                }
+                blockpos.x = Mathf.Floor(blockpos.x);
+                blockpos.y = Mathf.Floor(blockpos.y);
+                blockpos.z = Mathf.Floor(blockpos.z);
+                world.AddBlock(blockpos, blockType);
+            }
+        }
+    }
+
     [Command]
     private void CmdVerifyInputs(MVCInputPacket packet)
     {
@@ -324,10 +328,7 @@ public class MVCController : NetworkBehaviour {
         avatar.eulerAngles = state.eulerAvatar;
         camTrans.eulerAngles = state.eulerCam;
         yvel = state.yvel;
-        if(!isLocalPlayer)
-        {
-            Debug.Log(state.pos);
-        }
+        
         foreach(MVCInputPacket packet in sentPackets)
         {
             foreach(MVCInput input in packet.inputs)

@@ -42,8 +42,6 @@ public class WorldMaker : NetworkBehaviour
                     chunkPos.z = z;
                     chunksToBuild[iterator] = chunkPos;
                     ++iterator;
-                    //Chunk chunk = BuildChunk(chunkPos);
-                    //generator.BuildChunk(chunk);
                 }
             }
         }
@@ -56,13 +54,48 @@ public class WorldMaker : NetworkBehaviour
         {
             for(int i = 0; i < chunksGennedPerFrame && queuedChunk < chunksToBuild.Length; ++i)
             {
-                Chunk chunk = BuildChunk(chunksToBuild[queuedChunk]);
-                generator.BuildChunk(chunk);
+                if(isServer)
+                {
+                    Chunk chunk = BuildChunk(chunksToBuild[queuedChunk]);
+                    generator.BuildChunk(chunk);
+                }
+                else
+                {
+                    CmdSendClientChunkData(connectionToServer, chunksToBuild[queuedChunk]);
+                }
                 ++queuedChunk;
             }
         }
     }
+    
 
+    [Command]
+    private void CmdSendClientChunkData(NetworkConnection client, Vector3 pos)
+    {
+        Chunk chunk;
+        chunks.TryGetValue(pos, out chunk);
+
+        if(chunk == null)
+        {
+            chunk = BuildChunk(pos);
+        }
+
+        TargetReceiveChunkData(client, pos, chunk.GetBlockArray());
+    }
+
+    [TargetRpc]
+    private void TargetReceiveChunkData(NetworkConnection target, Vector3 pos, int[] blocks)
+    {
+        Chunk chunk;
+        chunks.TryGetValue(pos, out chunk);
+
+        if (chunk == null)
+        {
+            chunk = BuildChunk(pos);
+        }
+
+        chunk.SetBlocks(blocks);
+    }
 
     private Chunk BuildChunk(Vector3 pos)
     {
