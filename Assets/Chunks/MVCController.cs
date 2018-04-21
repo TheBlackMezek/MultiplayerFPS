@@ -16,13 +16,16 @@ public struct MVCInput
     public bool jump;
     public bool destroy;
     public bool place;
+
+    public float dt;
 }
 
 public struct MVCState
 {
     public int id;
     public Vector3 pos;
-    public Vector3 euler;
+    public Vector3 eulerAvatar;
+    public Vector3 eulerCam;
     public float yvel;
 }
 
@@ -85,7 +88,8 @@ public class MVCController : NetworkBehaviour {
         else
         {
             lastVerifiedState.pos = transform.position;
-            lastVerifiedState.euler = transform.eulerAngles;
+            lastVerifiedState.eulerAvatar = avatar.eulerAngles;
+            lastVerifiedState.eulerCam = camTrans.eulerAngles;
             lastVerifiedState.yvel = yvel;
             lastVerifiedState.id = packetId;
         }
@@ -100,8 +104,11 @@ public class MVCController : NetworkBehaviour {
         Cursor.lockState = CursorLockMode.Locked;
 
         MVCInput input = GetInput();
-        inputs.Add(input);
         ProcessInputAndMotion(input);
+        if(!isServer)
+        {
+            inputs.Add(input);
+        }
 
 
 
@@ -177,17 +184,23 @@ public class MVCController : NetworkBehaviour {
 
     private void FixedUpdate()
     {
-        if(isServer)
+        if(!isLocalPlayer)
         {
-            if(isLocalPlayer)
-            {
-                lastVerifiedState.pos = transform.position;
-                lastVerifiedState.euler = transform.eulerAngles;
-                lastVerifiedState.yvel = yvel;
-                RpcReconcileState(lastVerifiedState);
-            }
             return;
         }
+
+        if(isServer)
+        {
+            MVCState state;
+            state.id = packetId;
+            state.pos = avatar.position;
+            state.eulerAvatar = avatar.eulerAngles;
+            state.eulerCam = camTrans.eulerAngles;
+            state.yvel = yvel;
+            RpcReconcileState(state);
+            return;
+        }
+
         MVCInputPacket packet;
         packet.id = packetId;
         packet.inputs = inputs.ToArray();
@@ -206,6 +219,9 @@ public class MVCController : NetworkBehaviour {
     private MVCInput GetInput()
     {
         MVCInput input;
+
+        input.dt = Time.deltaTime;
+
         input.moveX = moveSpeed * Time.deltaTime * Input.GetAxis("Horizontal");
         input.moveZ = moveSpeed * Time.deltaTime * Input.GetAxis("Vertical");
 
@@ -233,7 +249,7 @@ public class MVCController : NetworkBehaviour {
     {
         if (!cc.isGrounded)
         {
-            yvel -= gravForce * Time.deltaTime;
+            yvel -= gravForce * input.dt;
         }
         else if (input.jump)
         {
@@ -244,7 +260,7 @@ public class MVCController : NetworkBehaviour {
             yvel = 0;
         }
 
-        Vector3 move = avatar.up * yvel * Time.deltaTime;
+        Vector3 move = avatar.up * yvel * input.dt;
         move += avatar.forward * input.moveZ;
         move += avatar.right * input.moveX;
         cc.Move(move);
@@ -278,8 +294,9 @@ public class MVCController : NetworkBehaviour {
         }
         MVCState state;
         state.id = packet.id;
-        state.pos = transform.position;
-        state.euler = transform.eulerAngles;
+        state.pos = avatar.position;
+        state.eulerAvatar = avatar.eulerAngles;
+        state.eulerCam = camTrans.eulerAngles;
         state.yvel = yvel;
         RpcReconcileState(state);
     }
@@ -287,6 +304,11 @@ public class MVCController : NetworkBehaviour {
     [ClientRpc]
     private void RpcReconcileState(MVCState state)
     {
+        if(isServer)
+        {
+            return;
+        }
+
         for(int i = 0; i < sentPackets.Count; ++i)
         {
             if(sentPackets[i].id == state.id)
@@ -298,10 +320,14 @@ public class MVCController : NetworkBehaviour {
 
         lastVerifiedState = state;
 
-        transform.position = state.pos;
-        transform.eulerAngles = state.euler;
+        avatar.position = state.pos;
+        avatar.eulerAngles = state.eulerAvatar;
+        camTrans.eulerAngles = state.eulerCam;
         yvel = state.yvel;
-
+        if(!isLocalPlayer)
+        {
+            Debug.Log(state.pos);
+        }
         foreach(MVCInputPacket packet in sentPackets)
         {
             foreach(MVCInput input in packet.inputs)
