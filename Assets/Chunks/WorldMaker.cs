@@ -9,8 +9,7 @@ public class WorldMaker : NetworkBehaviour
     private class ClientConnection
     {
         public NetworkConnection conn;
-        public Vector3[] chunksToBuild;
-        public int queuedChunk;
+        public Queue<Vector3> chunksToBuild = new Queue<Vector3>();
     }
 
 
@@ -92,37 +91,26 @@ public class WorldMaker : NetworkBehaviour
         for(int i = 0; i < clients.Count; ++i)
         {
             client = clients[i];
-            if (client.queuedChunk < client.chunksToBuild.Length)
+            if (client.chunksToBuild.Count > 0)
             {
-                for (int n = 0; n < chunksSentPerFrame && client.queuedChunk < client.chunksToBuild.Length; ++n)
+                for (int n = 0; n < chunksSentPerFrame && client.chunksToBuild.Count > 0; ++n)
                 {
-                    chunkPos = client.chunksToBuild[client.queuedChunk];
-                    Debug.Log("SENDING DATA FOR " + chunkPos);
-                    chunks.TryGetValue(client.chunksToBuild[client.queuedChunk], out chunk);
+                    chunkPos = client.chunksToBuild.Dequeue();
+                    chunks.TryGetValue(chunkPos, out chunk);
                     TargetReceiveChunkData(client.conn, chunkPos, chunk.GetBlockArray());
-                    ++client.queuedChunk;
-                    Debug.Log(client.queuedChunk);
                 }
             }
         }
     }
 
-    //private void FixedUpdate()
-    //{
-    //    
-    //}
-
     public void OnClientConnect(NetworkConnection connection)
     {
-        Debug.Log(connection.address);
         ClientConnection clcn = new ClientConnection();
         clcn.conn = connection;
-        clcn.queuedChunk = 0;
-        clcn.chunksToBuild = new Vector3[chunks.Count];
         int iterator = 0;
         foreach(KeyValuePair<Vector3, Chunk> entry in chunks)
         {
-            clcn.chunksToBuild[iterator] = entry.Key;
+            clcn.chunksToBuild.Enqueue(entry.Key);
             ++iterator;
         }
         clients.Add(clcn);
@@ -133,7 +121,6 @@ public class WorldMaker : NetworkBehaviour
     [TargetRpc]
     private void TargetReceiveChunkData(NetworkConnection target, Vector3 pos, int[] blocks)
     {
-        Debug.Log("RECEIVED DATA FOR " + pos);
         Chunk chunk;
         chunks.TryGetValue(pos, out chunk);
 
