@@ -36,6 +36,8 @@ public class WorldMaker : NetworkBehaviour
     {
         NetBridge.Instance.world = this;
         NetBridge.Instance.onServerConnect += OnClientConnect;
+
+        generator.Init();
     }
 
     private void Start()

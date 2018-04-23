@@ -14,17 +14,23 @@ public class WGPerlin : WorldGenAbstract
     public float persistence;
     public float lacunarity;
 
+    public int seed;
+
+    private Vector3[] offsets;
+    private float offsetRange = 10000;
 
 
-    public override WorldGenAbstract Instance
+    
+
+    public override void Init()
     {
-        get
+        offsets = new Vector3[octaves];
+        Random.InitState(seed);
+        for (int i = 0; i < octaves; ++i)
         {
-            if (instance == null)
-            {
-                instance = new WGPerlin();
-            }
-            return instance;
+            offsets[i] = new Vector3(Random.Range(-offsetRange, offsetRange),
+                                     Random.Range(-offsetRange, offsetRange),
+                                     Random.Range(-offsetRange, offsetRange));
         }
     }
 
@@ -71,9 +77,13 @@ public class WGPerlin : WorldGenAbstract
         float frequency = baseFrequency;
         float amplitude = heightScale;
 
+        Vector3 off;
+
         for(int i = 0; i < octaves; ++i)
         {
-            height += Mathf.PerlinNoise(blockpos.x * frequency, blockpos.y * frequency) * amplitude;
+            off = offsets[i];
+
+            height += Mathf.PerlinNoise((blockpos.x + off.x) * frequency, (blockpos.y + off.y) * frequency) * amplitude;
 
             amplitude *= persistence;
             frequency *= lacunarity;

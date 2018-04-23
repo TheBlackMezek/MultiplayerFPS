@@ -5,16 +5,21 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WGSolidStone", menuName = "Generators/SolidStone")]
 public class WGSolidStone : WorldGenAbstract {
 
-    public override WorldGenAbstract Instance
+    //public override WorldGenAbstract Instance
+    //{
+    //    get
+    //    {
+    //        if(instance == null)
+    //        {
+    //            instance = new WGSolidStone();
+    //        }
+    //        return instance;
+    //    }
+    //}
+
+    public override void Init()
     {
-        get
-        {
-            if(instance == null)
-            {
-                instance = new WGSolidStone();
-            }
-            return instance;
-        }
+        
     }
 
     public override void BuildChunk(Chunk chunk)

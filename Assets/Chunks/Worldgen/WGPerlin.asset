@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Name: WGPerlin
   m_EditorClassIdentifier: 
   groundStart: 0
-  heightScale: 50
+  heightScale: 100
   baseFrequency: 0.005
   octaves: 5
   persistence: 0.5
   lacunarity: 2
+  seed: 10
