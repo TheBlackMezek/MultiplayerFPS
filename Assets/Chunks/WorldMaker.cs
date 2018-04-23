@@ -91,7 +91,7 @@ public class WorldMaker : NetworkBehaviour
         for(int i = 0; i < clients.Count; ++i)
         {
             client = clients[i];
-            if (client.chunksToBuild.Count > 0)
+            if (client.conn.isReady && client.chunksToBuild.Count > 0)
             {
                 for (int n = 0; n < chunksSentPerFrame && client.chunksToBuild.Count > 0; ++n)
                 {
@@ -169,43 +169,20 @@ public class WorldMaker : NetworkBehaviour
         }
         pos = pos - chunkPos * Chunk.ChunkSize;
         chunk.DestroyBlock(pos);
+        
+        if(isServer)
+        {
+            foreach (ClientConnection client in clients)
+            {
+                client.chunksToBuild.Enqueue(chunkPos);
+            }
+        }
     }
 
     [Command]
     public void CmdDestroyBlock(Vector3 pos)
     {
-        Vector3 chunkPos = pos / Chunk.ChunkSize;
-        chunkPos.x = Mathf.Floor(chunkPos.x);
-        chunkPos.y = Mathf.Floor(chunkPos.y);
-        chunkPos.z = Mathf.Floor(chunkPos.z);
-        Chunk chunk;
-        if (!chunks.TryGetValue(chunkPos, out chunk))
-        {
-            chunk = BuildChunk(chunkPos).GetComponent<Chunk>();
-        }
-        pos = pos - chunkPos * Chunk.ChunkSize;
-        chunk.DestroyBlock(pos);
-        RpcDestroyBlock(pos);
-    }
-
-    [ClientRpc]
-    public void RpcDestroyBlock(Vector3 pos)
-    {
-        if(isServer)
-        {
-            return;
-        }
-        Vector3 chunkPos = pos / Chunk.ChunkSize;
-        chunkPos.x = Mathf.Floor(chunkPos.x);
-        chunkPos.y = Mathf.Floor(chunkPos.y);
-        chunkPos.z = Mathf.Floor(chunkPos.z);
-        Chunk chunk;
-        if (!chunks.TryGetValue(chunkPos, out chunk))
-        {
-            chunk = BuildChunk(chunkPos).GetComponent<Chunk>();
-        }
-        pos = pos - chunkPos * Chunk.ChunkSize;
-        chunk.DestroyBlock(pos);
+        DestroyBlock(pos);
     }
 
     public void AddBlock(Vector3 pos, int type)
@@ -221,11 +198,25 @@ public class WorldMaker : NetworkBehaviour
         }
         pos = pos - chunkPos * Chunk.ChunkSize;
         chunk.AddBlock(pos, type);
+
+        if (isServer)
+        {
+            foreach (ClientConnection client in clients)
+            {
+                client.chunksToBuild.Enqueue(chunkPos);
+            }
+        }
+    }
+
+    [Command]
+    public void CmdAddBlock(Vector3 pos, int type)
+    {
+        AddBlock(pos, type);
     }
 
     public Vector3 GetPlayerSpawn()
     {
-        return new Vector3(0, worldSize * Chunk.ChunkSize, 0);
+        return new Vector3(0, (worldSize+1) * Chunk.ChunkSize, 0);
     }
 
 

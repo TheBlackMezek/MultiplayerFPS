@@ -104,6 +104,23 @@ public class MVCController : NetworkBehaviour {
         Cursor.lockState = CursorLockMode.Locked;
 
         MVCInput input = GetInput();
+
+        blockType += input.blockTypeChange;
+        if (blockType > numOfBlockTypes)
+        {
+            blockType = 1;
+        }
+        else if (blockType < 1)
+        {
+            blockType = numOfBlockTypes;
+        }
+
+        if (input.blockTypeChange != 0)
+        {
+            UIBridge.Instance.OnBlockSelectionChange(blockType);
+        }
+
+
         ProcessInputAndMotion(input);
         if(!isServer)
         {
@@ -111,24 +128,7 @@ public class MVCController : NetworkBehaviour {
         }
 
 
-
-        blockType += input.blockTypeChange;
-        if(blockType > numOfBlockTypes)
-        {
-            blockType = 1;
-        }
-        else if(blockType < 1)
-        {
-            blockType = numOfBlockTypes;
-        }
-
-        if(input.blockTypeChange != 0)
-        {
-            UIBridge.Instance.OnBlockSelectionChange(blockType);
-        }
-
-
-        ProcessInteractionInput(input);
+        //ProcessInteractionInput(input);
         
 	}
 
@@ -195,7 +195,7 @@ public class MVCController : NetworkBehaviour {
         return input;
     }
 
-    private void ProcessInputAndMotion(MVCInput input)
+    private void ProcessInputAndMotion(MVCInput input, bool doInteractionInput = true)
     {
         if (!cc.isGrounded)
         {
@@ -233,6 +233,12 @@ public class MVCController : NetworkBehaviour {
             camAng.x = Mathf.Clamp(camAng.x, 0.0f, camPitchClamp2);
         }
         camTrans.eulerAngles = camAng;
+
+
+        if(doInteractionInput)
+        {
+            ProcessInteractionInput(input);
+        }
     }
 
     private void ProcessInteractionInput(MVCInput input)
@@ -333,7 +339,7 @@ public class MVCController : NetworkBehaviour {
         {
             foreach(MVCInput input in packet.inputs)
             {
-                ProcessInputAndMotion(input);
+                ProcessInputAndMotion(input, false);
             }
         }
     }

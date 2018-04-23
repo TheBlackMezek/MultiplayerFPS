@@ -150,46 +150,7 @@ public class Chunk : NetworkBehaviour {
 
     public void DestroyBlock(Vector3 pos)
     {
-        //Debug.Log(isServer);
         if (pos.x >= 0 && pos.x < chunkSize
-         && pos.y >= 0 && pos.y < chunkSize
-         && pos.z >= 0 && pos.z < chunkSize)
-        {
-            blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = 0;
-            BuildMesh();
-            if(!isServer)
-            {
-                //Debug.Log("CALLING CMD DESTROY");
-                CmdDestroyBlock(pos);
-            }
-            else
-            {
-                //Debug.Log("CALLING RPC DESTROY");
-                RpcDestroyBlock(pos);
-            }
-        }
-    }
-
-    [Command]
-    public void CmdDestroyBlock(Vector3 pos)
-    {
-        //Debug.Log("CMD DESTROY CALLED");
-        if (pos.x >= 0 && pos.x < chunkSize
-         && pos.y >= 0 && pos.y < chunkSize
-         && pos.z >= 0 && pos.z < chunkSize)
-        {
-            blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = 0;
-            BuildMesh();
-            RpcDestroyBlock(pos);
-        }
-    }
-
-    [ClientRpc]
-    public void RpcDestroyBlock(Vector3 pos)
-    {
-        //Debug.Log("RPC DESTROY CALLED");
-        if (!isServer
-         && pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize
          && pos.z >= 0 && pos.z < chunkSize)
         {
