@@ -183,18 +183,27 @@ public class WorldMaker : NetworkBehaviour
         }
     }
 
-    [Command]
-    public void CmdDestroyBlock(Vector3 pos)
-    {
-        DestroyBlock(pos);
-    }
-
     public void AddBlock(Vector3 pos, int type)
     {
         Vector3 chunkPos = pos / Chunk.ChunkSize;
         chunkPos.x = Mathf.Floor(chunkPos.x);
         chunkPos.y = Mathf.Floor(chunkPos.y);
         chunkPos.z = Mathf.Floor(chunkPos.z);
+        
+        if (Physics.CheckBox(pos + Vector3.one / 2.0f, Vector3.one / 2.0f, Quaternion.identity, ~LayerMask.GetMask("Chunk")))
+        {
+            if (isServer)
+            {
+                foreach (ClientConnection client in clients)
+                {
+                    client.chunksToBuild.Enqueue(chunkPos);
+                }
+            }
+            return;
+        }
+
+
+
         Chunk chunk;
         if (!chunks.TryGetValue(chunkPos, out chunk))
         {
@@ -210,12 +219,6 @@ public class WorldMaker : NetworkBehaviour
                 client.chunksToBuild.Enqueue(chunkPos);
             }
         }
-    }
-
-    [Command]
-    public void CmdAddBlock(Vector3 pos, int type)
-    {
-        AddBlock(pos, type);
     }
 
     public Vector3 GetPlayerSpawn()
