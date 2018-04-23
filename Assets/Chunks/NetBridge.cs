@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class NetBridge {
 
@@ -17,6 +18,13 @@ public class NetBridge {
             return instance;
         }
     }
+
+
+
+    public delegate void OnServerConnect(NetworkConnection connection);
+
+    public OnServerConnect onServerConnect;
+
 
     public WorldMaker world;
 

@@ -150,7 +150,7 @@ public class Chunk : NetworkBehaviour {
 
     public void DestroyBlock(Vector3 pos)
     {
-        Debug.Log(isServer);
+        //Debug.Log(isServer);
         if (pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize
          && pos.z >= 0 && pos.z < chunkSize)
@@ -159,12 +159,12 @@ public class Chunk : NetworkBehaviour {
             BuildMesh();
             if(!isServer)
             {
-                Debug.Log("CALLING CMD DESTROY");
+                //Debug.Log("CALLING CMD DESTROY");
                 CmdDestroyBlock(pos);
             }
             else
             {
-                Debug.Log("CALLING RPC DESTROY");
+                //Debug.Log("CALLING RPC DESTROY");
                 RpcDestroyBlock(pos);
             }
         }
@@ -173,7 +173,7 @@ public class Chunk : NetworkBehaviour {
     [Command]
     public void CmdDestroyBlock(Vector3 pos)
     {
-        Debug.Log("CMD DESTROY CALLED");
+        //Debug.Log("CMD DESTROY CALLED");
         if (pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize
          && pos.z >= 0 && pos.z < chunkSize)
@@ -187,7 +187,7 @@ public class Chunk : NetworkBehaviour {
     [ClientRpc]
     public void RpcDestroyBlock(Vector3 pos)
     {
-        Debug.Log("RPC DESTROY CALLED");
+        //Debug.Log("RPC DESTROY CALLED");
         if (!isServer
          && pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize

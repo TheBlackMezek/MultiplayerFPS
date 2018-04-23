@@ -5,16 +5,29 @@ using UnityEngine.Networking;
 
 public class WorldMaker : NetworkBehaviour
 {
+
+    private class ClientConnection
+    {
+        public NetworkConnection conn;
+        public Vector3[] chunksToBuild;
+        public int queuedChunk;
+    }
+
+
+
     
     public GameObject chunkPrefab;
     
     public int worldSize = 3;
     public int chunksGennedPerFrame;
+    public int chunksSentPerFrame = 1;
     public WorldGenAbstract generator;
 
     private Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
     private Vector3[] chunksToBuild;
     private int queuedChunk = 0;
+
+    private List<ClientConnection> clients = new List<ClientConnection>();
 
 
 
@@ -23,10 +36,18 @@ public class WorldMaker : NetworkBehaviour
     private void Awake()
     {
         NetBridge.Instance.world = this;
+        NetBridge.Instance.onServerConnect += OnClientConnect;
     }
 
     private void Start()
     {
+        if(!isServer)
+        {
+            return;
+        }
+
+
+
         chunksToBuild = new Vector3[worldSize * worldSize * worldSize];
 
         int iterator = 0;
@@ -50,42 +71,69 @@ public class WorldMaker : NetworkBehaviour
 
     private void Update()
     {
+        if(!isServer)
+        {
+            return;
+        }
+
+        Chunk chunk;
         if(queuedChunk < chunksToBuild.Length)
         {
             for(int i = 0; i < chunksGennedPerFrame && queuedChunk < chunksToBuild.Length; ++i)
             {
-                if(isServer)
-                {
-                    Chunk chunk = BuildChunk(chunksToBuild[queuedChunk]);
-                    generator.BuildChunk(chunk);
-                }
-                else
-                {
-                    CmdSendClientChunkData(connectionToServer, chunksToBuild[queuedChunk]);
-                }
+                chunk = BuildChunk(chunksToBuild[queuedChunk]);
+                generator.BuildChunk(chunk);
                 ++queuedChunk;
             }
         }
+
+        Vector3 chunkPos;
+        ClientConnection client;
+        for(int i = 0; i < clients.Count; ++i)
+        {
+            client = clients[i];
+            if (client.queuedChunk < client.chunksToBuild.Length)
+            {
+                for (int n = 0; n < chunksSentPerFrame && client.queuedChunk < client.chunksToBuild.Length; ++n)
+                {
+                    chunkPos = client.chunksToBuild[client.queuedChunk];
+                    Debug.Log("SENDING DATA FOR " + chunkPos);
+                    chunks.TryGetValue(client.chunksToBuild[client.queuedChunk], out chunk);
+                    TargetReceiveChunkData(client.conn, chunkPos, chunk.GetBlockArray());
+                    ++client.queuedChunk;
+                    Debug.Log(client.queuedChunk);
+                }
+            }
+        }
+    }
+
+    //private void FixedUpdate()
+    //{
+    //    
+    //}
+
+    public void OnClientConnect(NetworkConnection connection)
+    {
+        Debug.Log(connection.address);
+        ClientConnection clcn = new ClientConnection();
+        clcn.conn = connection;
+        clcn.queuedChunk = 0;
+        clcn.chunksToBuild = new Vector3[chunks.Count];
+        int iterator = 0;
+        foreach(KeyValuePair<Vector3, Chunk> entry in chunks)
+        {
+            clcn.chunksToBuild[iterator] = entry.Key;
+            ++iterator;
+        }
+        clients.Add(clcn);
     }
     
 
-    [Command]
-    private void CmdSendClientChunkData(NetworkConnection client, Vector3 pos)
-    {
-        Chunk chunk;
-        chunks.TryGetValue(pos, out chunk);
-
-        if(chunk == null)
-        {
-            chunk = BuildChunk(pos);
-        }
-
-        TargetReceiveChunkData(client, pos, chunk.GetBlockArray());
-    }
 
     [TargetRpc]
     private void TargetReceiveChunkData(NetworkConnection target, Vector3 pos, int[] blocks)
     {
+        Debug.Log("RECEIVED DATA FOR " + pos);
         Chunk chunk;
         chunks.TryGetValue(pos, out chunk);
 
