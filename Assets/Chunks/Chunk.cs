@@ -109,8 +109,8 @@ public class Chunk : NetworkBehaviour {
                             {
                                 vertices.Add(cubeModel.cubeVertices[n + i * 4] + blockpos);
                                 Vector2 uvpos = cubeModel.cubeUv[n + i * 4];
-                                uvpos.x = uvpos.x * atlasXIncrement + (blockType - 1) * atlasXIncrement;
-                                uvpos.y = uvpos.y * atlasYIncrement + (blockType - 1) * atlasYIncrement;
+                                uvpos.x = uvpos.x * atlasXIncrement + ((blockType % cubeModel.atlasSize.x) + 1) * atlasXIncrement;
+                                uvpos.y = uvpos.y * atlasYIncrement + (cubeModel.atlasSize.x - 1 - (int)((blockType-1) / cubeModel.atlasSize.x)) * atlasYIncrement;
                                 uv.Add(uvpos);
                                 normals.Add(cubeModel.cubeNormal[n + i * 4]);
                             }
@@ -152,7 +152,8 @@ public class Chunk : NetworkBehaviour {
     {
         if (pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize
-         && pos.z >= 0 && pos.z < chunkSize)
+         && pos.z >= 0 && pos.z < chunkSize
+         && NetBridge.Instance.blockTypeManager.IsBlockDestroyable(GetBlock(pos)))
         {
             blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = 0;
             BuildMesh();

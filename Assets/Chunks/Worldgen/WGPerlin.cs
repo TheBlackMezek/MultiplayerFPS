@@ -41,7 +41,11 @@ public class WGPerlin : WorldGenAbstract
                 float height = UsePerlin(blockpos);
                 for (int y = 0; y < Chunk.ChunkSize; ++y)
                 {
-                    if(y + chunk.transform.position.y - groundStart <= height-1)
+                    if(y + chunk.transform.position.y == 0)
+                    {
+                        blocks[x + y * Chunk.ChunkSize + z * Chunk.ChunkSize * Chunk.ChunkSize] = 3;
+                    }
+                    else if(y + chunk.transform.position.y - groundStart <= height-1)
                     {
                         blocks[x + y * Chunk.ChunkSize + z * Chunk.ChunkSize * Chunk.ChunkSize] = 1;
                     }

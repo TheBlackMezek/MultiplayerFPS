@@ -27,5 +27,6 @@ public class NetBridge {
 
 
     public WorldMaker world;
+    public BlockTypeManager blockTypeManager;
 
 }

@@ -19,12 +19,14 @@ public class ChunkUIManager : MonoBehaviour {
         uv.width = 1.0f / cubeModel.atlasSize.x;
         uv.height = 1.0f / cubeModel.atlasSize.y;
         blockTypeImage.uvRect = uv;
+        OnBlockTypeChange(1);
     }
 
     public void OnBlockTypeChange(int type)
     {
         Rect uv = blockTypeImage.uvRect;
-        uv.x = (type - 1) * 1.0f / cubeModel.atlasSize.x;
+        uv.x = ((type - 1) % cubeModel.atlasSize.x) * (1.0f / cubeModel.atlasSize.x);
+        uv.y = (cubeModel.atlasSize.x - 1 - (int)((type - 1) / cubeModel.atlasSize.x)) * (1.0f / cubeModel.atlasSize.y);
         blockTypeImage.uvRect = uv;
     }
 

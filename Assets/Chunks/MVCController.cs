@@ -57,7 +57,7 @@ public class MVCController : NetworkBehaviour {
 
     private float yvel = 0;
     private int blockType = 1;
-    private int numOfBlockTypes = 2;
+    private int numOfBlockTypes = 3;
 
     private WorldMaker world;
 
@@ -232,13 +232,23 @@ public class MVCController : NetworkBehaviour {
 
 
         blockType += input.blockTypeChange;
-        if (blockType > numOfBlockTypes)
+        while (blockType > numOfBlockTypes
+            || blockType < 1
+            || !NetBridge.Instance.blockTypeManager.IsBlockPlacable(blockType))
         {
-            blockType = 1;
-        }
-        else if (blockType < 1)
-        {
-            blockType = numOfBlockTypes;
+            if (blockType > numOfBlockTypes)
+            {
+                blockType = 1;
+            }
+            else if (blockType < 1)
+            {
+                blockType = numOfBlockTypes;
+            }
+
+            if(!NetBridge.Instance.blockTypeManager.IsBlockPlacable(blockType))
+            {
+                blockType += input.blockTypeChange;
+            }
         }
 
         if (isLocalPlayer && input.blockTypeChange != 0)
