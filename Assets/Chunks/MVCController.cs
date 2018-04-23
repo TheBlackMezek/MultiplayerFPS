@@ -27,6 +27,7 @@ public struct MVCState
     public Vector3 eulerAvatar;
     public Vector3 eulerCam;
     public float yvel;
+    public int blockType;
 }
 
 public struct MVCInputPacket
@@ -93,6 +94,7 @@ public class MVCController : NetworkBehaviour {
             lastVerifiedState.eulerCam = camTrans.eulerAngles;
             lastVerifiedState.yvel = yvel;
             lastVerifiedState.id = packetId;
+            lastVerifiedState.blockType = blockType;
         }
     }
 
@@ -106,20 +108,6 @@ public class MVCController : NetworkBehaviour {
 
         MVCInput input = GetInput();
 
-        blockType += input.blockTypeChange;
-        if (blockType > numOfBlockTypes)
-        {
-            blockType = 1;
-        }
-        else if (blockType < 1)
-        {
-            blockType = numOfBlockTypes;
-        }
-
-        if (input.blockTypeChange != 0)
-        {
-            UIBridge.Instance.OnBlockSelectionChange(blockType);
-        }
 
 
         ProcessInputAndMotion(input);
@@ -148,6 +136,7 @@ public class MVCController : NetworkBehaviour {
             state.eulerAvatar = avatar.eulerAngles;
             state.eulerCam = camTrans.eulerAngles;
             state.yvel = yvel;
+            state.blockType = blockType;
             RpcReconcileState(state);
             return;
         }
@@ -241,7 +230,24 @@ public class MVCController : NetworkBehaviour {
         camTrans.eulerAngles = camAng;
 
 
-        if(doInteractionInput)
+
+        blockType += input.blockTypeChange;
+        if (blockType > numOfBlockTypes)
+        {
+            blockType = 1;
+        }
+        else if (blockType < 1)
+        {
+            blockType = numOfBlockTypes;
+        }
+
+        if (isLocalPlayer && input.blockTypeChange != 0)
+        {
+            UIBridge.Instance.OnBlockSelectionChange(blockType);
+        }
+
+
+        if (doInteractionInput)
         {
             ProcessInteractionInput(input);
         }
@@ -314,6 +320,7 @@ public class MVCController : NetworkBehaviour {
         state.eulerAvatar = avatar.eulerAngles;
         state.eulerCam = camTrans.eulerAngles;
         state.yvel = yvel;
+        state.blockType = blockType;
         RpcReconcileState(state);
     }
 
@@ -340,6 +347,7 @@ public class MVCController : NetworkBehaviour {
         avatar.eulerAngles = state.eulerAvatar;
         camTrans.eulerAngles = state.eulerCam;
         yvel = state.yvel;
+        blockType = state.blockType;
         
         foreach(MVCInputPacket packet in sentPackets)
         {
