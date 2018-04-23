@@ -82,6 +82,10 @@ public class WorldMaker : NetworkBehaviour
             {
                 chunk = BuildChunk(chunksToBuild[queuedChunk]);
                 generator.BuildChunk(chunk);
+                foreach (ClientConnection c in clients)
+                {
+                    c.chunksToBuild.Enqueue(chunksToBuild[queuedChunk]);
+                }
                 ++queuedChunk;
             }
         }

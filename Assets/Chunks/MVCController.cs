@@ -45,6 +45,7 @@ public class MVCController : NetworkBehaviour {
     public float camPitchClamp1 = 271.0f;
     public float camPitchClamp2 = 89.0f;
     public float interactRange;
+    public float worldBottom = 0;
     
     public CharacterController cc;
     public Transform avatar;
@@ -214,6 +215,11 @@ public class MVCController : NetworkBehaviour {
         move += avatar.forward * input.moveZ;
         move += avatar.right * input.moveX;
         cc.Move(move);
+
+        if(avatar.position.y < worldBottom)
+        {
+            avatar.position = world.GetPlayerSpawn();
+        }
 
 
 
