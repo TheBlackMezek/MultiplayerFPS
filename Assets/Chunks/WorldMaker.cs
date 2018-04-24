@@ -186,10 +186,25 @@ public class WorldMaker : NetworkBehaviour
         Chunk chunk;
         Vector3 chunkPos;
 
-        if(blockpos.x % Chunk.ChunkSize == 0)
+        if(blockpos.x >= 0 && blockpos.x % Chunk.ChunkSize == 0)
         {
             chunkPos = GetChunkIn(blockpos - Vector3.right);
             if(chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        else if(blockpos.x < 0 && (blockpos.x + 1) % Chunk.ChunkSize == 0)
+        {
+            chunkPos = GetChunkIn(blockpos + Vector3.right);
+            if (chunks.TryGetValue(chunkPos, out chunk))
             {
                 chunk.BuildMesh();
                 if (isServer)
@@ -363,6 +378,7 @@ public class WorldMaker : NetworkBehaviour
         {
             if (isServer)
             {
+                UpdateAdjacentChunk(pos);
                 foreach (ClientConnection client in clients)
                 {
                     client.chunksToBuild.Enqueue(chunkPos);
@@ -378,8 +394,10 @@ public class WorldMaker : NetworkBehaviour
         {
             chunk = BuildChunk(chunkPos);
         }
-        pos = pos - chunkPos * Chunk.ChunkSize;
-        chunk.AddBlock(pos, type);
+        Vector3 posInChunk = pos - chunkPos * Chunk.ChunkSize;
+        chunk.AddBlock(posInChunk, type);
+
+        UpdateAdjacentChunk(pos);
 
         if (isServer)
         {

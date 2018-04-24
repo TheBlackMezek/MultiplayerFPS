@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cd824f6ebb98054296c0ddcd3032a24, type: 3}
   m_Name: WGPerlin
   m_EditorClassIdentifier: 
-  groundStart: 0
+  groundStart: -64
   heightScale: 100
   baseFrequency: 0.005
   octaves: 5
