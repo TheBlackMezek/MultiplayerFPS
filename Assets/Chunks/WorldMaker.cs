@@ -382,6 +382,8 @@ public class WorldMaker : NetworkBehaviour
         }
 
         chunk.SetBlocks(blocks);
+
+        UpdateSurroundingChunks(pos);
     }
 
     private Chunk BuildChunk(Vector3 pos)
