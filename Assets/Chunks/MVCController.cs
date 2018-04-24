@@ -53,6 +53,8 @@ public class MVCController : NetworkBehaviour {
     public Transform camTrans;
     public Camera cam;
     public AudioListener ls;
+    public GameObject playerUI;
+    public ChatUIManager chatUIManager;
 
 
     private float yvel = 0;
@@ -82,13 +84,21 @@ public class MVCController : NetworkBehaviour {
         world = NetBridge.Instance.world;
         transform.position = world.GetPlayerSpawn();
 
+
+
+        if(isLocalPlayer || isServer)
+        {
+            chatUIManager.enabled = true;
+        }
         if (!isLocalPlayer)
         {
             cam.enabled = false;
             ls.enabled = false;
+            Destroy(playerUI);
         }
         else
         {
+            playerUI.SetActive(true);
             lastVerifiedState.pos = transform.position;
             lastVerifiedState.eulerAvatar = avatar.eulerAngles;
             lastVerifiedState.eulerCam = camTrans.eulerAngles;
@@ -104,9 +114,18 @@ public class MVCController : NetworkBehaviour {
             return;
         }
 
-        Cursor.lockState = CursorLockMode.Locked;
 
-        MVCInput input = GetInput();
+        MVCInput input;
+        if (UIBridge.Instance.uiIntercept)
+        {
+            input = EmptyInput();
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            input = GetInput();
+        }
 
 
 
@@ -182,6 +201,26 @@ public class MVCController : NetworkBehaviour {
         input.jump = Input.GetAxis("Jump") > 0;
         input.destroy = Input.GetMouseButtonDown(0);
         input.place = Input.GetMouseButtonDown(1);
+        return input;
+    }
+
+    private MVCInput EmptyInput()
+    {
+        MVCInput input;
+
+        input.dt = Time.deltaTime;
+
+        input.moveX = 0;
+        input.moveZ = 0;
+
+        input.rotPitch = 0;
+        input.rotYaw = 0;
+
+        input.blockTypeChange = 0;
+
+        input.jump = false;
+        input.destroy = false;
+        input.place = false;
         return input;
     }
 

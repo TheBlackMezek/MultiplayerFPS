@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class UIBridge {
 
@@ -20,5 +21,10 @@ public class UIBridge {
 
     public delegate void onBlockSelectionChange(int type);
     public onBlockSelectionChange OnBlockSelectionChange;
+
+    public delegate void disperseChatMessage(string msg);
+    public disperseChatMessage DisperseChatMessage;
+
+    public bool uiIntercept = false;
 
 }
