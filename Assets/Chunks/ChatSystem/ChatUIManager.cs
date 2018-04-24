@@ -63,10 +63,14 @@ public class ChatUIManager : NetworkBehaviour {
                 chatField.gameObject.SetActive(false);
                 if(chatField.text != "")
                 {
-                    CmdSendChatMessage(chatField.text);
+                    CmdSendChatMessage(Network.player.ipAddress + ": " + chatField.text);
                     chatField.text = "";
+                    textGridHideTimer = textGridShowTime;
                 }
-                textGridHideTimer = textGridShowTime;
+                else if(textGridHideTimer <= 0)
+                {
+                    chatTextGridPanel.SetActive(false);
+                }
             }
             else
             {

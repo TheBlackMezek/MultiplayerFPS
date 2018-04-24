@@ -6,6 +6,18 @@ using UnityEngine.Networking;
 public class ChunkNetManager : NetworkManager {
 
     public NetworkManagerHUD hud;
+    public NetworkDiscovery netDiscovery;
+
+    private string serverName;
+
+
+
+
+    private void Start()
+    {
+        netDiscovery.Initialize();
+        netDiscovery.StartAsClient();
+    }
 
     public override void OnServerConnect(NetworkConnection conn)
     {
@@ -18,6 +30,12 @@ public class ChunkNetManager : NetworkManager {
     public override void OnClientConnect(NetworkConnection conn)
     {
         hud.enabled = false;
+    }
+
+    public void HostGame(string name)
+    {
+        serverName = name;
+        StartHost();
     }
 
 }
