@@ -216,7 +216,7 @@ public class WorldMaker : NetworkBehaviour
                 }
             }
         }
-        else if(blockpos.x % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        else if(blockpos.x >= 0 && blockpos.x % Chunk.ChunkSize == Chunk.ChunkSize - 1)
         {
             chunkPos = GetChunkIn(blockpos + Vector3.right);
             if (chunks.TryGetValue(chunkPos, out chunk))
@@ -231,8 +231,23 @@ public class WorldMaker : NetworkBehaviour
                 }
             }
         }
-        
-        if (blockpos.y % Chunk.ChunkSize == 0)
+        else if (blockpos.x < 0 && (blockpos.x + 1) % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos - Vector3.right);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+
+        if (blockpos.y >= 0 && blockpos.y % Chunk.ChunkSize == 0)
         {
             chunkPos = GetChunkIn(blockpos - Vector3.up);
             if (chunks.TryGetValue(chunkPos, out chunk))
@@ -247,7 +262,7 @@ public class WorldMaker : NetworkBehaviour
                 }
             }
         }
-        else if (blockpos.y % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        else if (blockpos.y < 0 && (blockpos.y + 1) % Chunk.ChunkSize == 0)
         {
             chunkPos = GetChunkIn(blockpos + Vector3.up);
             if (chunks.TryGetValue(chunkPos, out chunk))
@@ -262,8 +277,38 @@ public class WorldMaker : NetworkBehaviour
                 }
             }
         }
+        else if (blockpos.y >= 0 && blockpos.y % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos + Vector3.up);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        else if (blockpos.y < 0 && (blockpos.y + 1) % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos - Vector3.up);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
 
-        if (blockpos.z % Chunk.ChunkSize == 0)
+        if (blockpos.z >= 0 && blockpos.z % Chunk.ChunkSize == 0)
         {
             chunkPos = GetChunkIn(blockpos - Vector3.forward);
             if (chunks.TryGetValue(chunkPos, out chunk))
@@ -278,9 +323,39 @@ public class WorldMaker : NetworkBehaviour
                 }
             }
         }
-        else if (blockpos.z % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        else if (blockpos.z < 0 && (blockpos.z + 1) % Chunk.ChunkSize == 0)
         {
             chunkPos = GetChunkIn(blockpos + Vector3.forward);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        else if (blockpos.z >= 0 && blockpos.z % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos + Vector3.forward);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        else if (blockpos.z < 0 && (blockpos.z + 1) % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos - Vector3.forward);
             if (chunks.TryGetValue(chunkPos, out chunk))
             {
                 chunk.BuildMesh();

@@ -11,7 +11,8 @@ public class BlockTypeManager : MonoBehaviour {
     private void Awake()
     {
         NetBridge.Instance.blockTypeManager = this;
-        
+
+        RegisterType(new BlockAir());
         RegisterType(new BlockStone());
         RegisterType(new BlockGrass());
         RegisterType(new BlockBedrock());
