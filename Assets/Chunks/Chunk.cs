@@ -18,6 +18,18 @@ public class Chunk : NetworkBehaviour {
         }
     }
 
+    public Vector3 ChunkPos
+    {
+        get
+        {
+            Vector3 pos = transform.position / chunkSize;
+            pos.x = Mathf.Floor(pos.x);
+            pos.y = Mathf.Floor(pos.y);
+            pos.z = Mathf.Floor(pos.z);
+            return pos;
+        }
+    }
+
     private int[] blocks;
 
 
@@ -45,6 +57,8 @@ public class Chunk : NetworkBehaviour {
         normals = new List<Vector3>();
 
         Vector3 blockpos;
+        Vector3 cp = transform.position;
+        WorldMaker world = NetBridge.Instance.world;
         for (int z = 0; z < chunkSize; ++z)
         {
             for (int y = 0; y < chunkSize; ++y)
@@ -62,37 +76,37 @@ public class Chunk : NetworkBehaviour {
                             switch (i)
                             {
                                 case 0: //front
-                                    if (z < chunkSize - 1 && GetBlock(x, y, z + 1) > 0)
+                                    if (world.GetBlock(x + (int)cp.x, y + (int)cp.y, z + (int)cp.z + 1) > 0)
                                     {
                                         continue;
                                     }
                                     break;
                                 case 1: //back
-                                    if (z > 0 && GetBlock(x, y, z - 1) > 0)
+                                    if (world.GetBlock(x + (int)cp.x, y + (int)cp.y, z + (int)cp.z - 1) > 0)
                                     {
                                         continue;
                                     }
                                     break;
                                 case 2: //top
-                                    if (y < chunkSize - 1 && GetBlock(x, y + 1, z) > 0)
+                                    if (world.GetBlock(x + (int)cp.x, y + (int)cp.y + 1, z + (int)cp.z) > 0)
                                     {
                                         continue;
                                     }
                                     break;
                                 case 3: //bot
-                                    if (y > 0 && GetBlock(x, y - 1, z) > 0)
+                                    if (world.GetBlock(x + (int)cp.x, y + (int)cp.y - 1, z + (int)cp.z) > 0)
                                     {
                                         continue;
                                     }
                                     break;
                                 case 4: //right
-                                    if (x < chunkSize - 1 && GetBlock(x + 1, y, z) > 0)
+                                    if (world.GetBlock(x + (int)cp.x + 1, y + (int)cp.y, z + (int)cp.z) > 0)
                                     {
                                         continue;
                                     }
                                     break;
                                 case 5: //left
-                                    if (x > 0 && GetBlock(x - 1, y, z) > 0)
+                                    if (world.GetBlock(x + (int)cp.x - 1, y + (int)cp.y, z + (int)cp.z) > 0)
                                     {
                                         continue;
                                     }

@@ -511,7 +511,7 @@ MonoBehaviour:
   chunkPrefab: {fileID: 1362487719053886, guid: a640a48e6d26ac14b9b7ded198442f34,
     type: 2}
   worldSize: 25
-  chunksGennedPerFrame: 10
+  chunksGennedPerFrame: 5
   chunksSentPerFrame: 1
   generator: {fileID: 11400000, guid: 0988b6254320f9f4eb41aca4812072e6, type: 2}
 --- !u!114 &1522753158

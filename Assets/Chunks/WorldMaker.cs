@@ -89,6 +89,7 @@ public class WorldMaker : NetworkBehaviour
                     c.chunksToBuild.Enqueue(chunksToBuild[queuedChunk]);
                 }
                 ++queuedChunk;
+                UpdateSurroundingChunks(chunk.ChunkPos);
             }
         }
 
@@ -124,6 +125,161 @@ public class WorldMaker : NetworkBehaviour
     
 
 
+    private void UpdateSurroundingChunks(Vector3 chunkpos)
+    {
+        Chunk chunk;
+
+        if(chunks.TryGetValue(chunkpos + Vector3.forward, out chunk))
+        {
+            chunk.BuildMesh();
+            foreach (ClientConnection c in clients)
+            {
+                c.chunksToBuild.Enqueue(chunkpos + Vector3.forward);
+            }
+        }
+        if (chunks.TryGetValue(chunkpos - Vector3.forward, out chunk))
+        {
+            chunk.BuildMesh();
+            foreach (ClientConnection c in clients)
+            {
+                c.chunksToBuild.Enqueue(chunkpos - Vector3.forward);
+            }
+        }
+
+        if (chunks.TryGetValue(chunkpos + Vector3.up, out chunk))
+        {
+            chunk.BuildMesh();
+            foreach (ClientConnection c in clients)
+            {
+                c.chunksToBuild.Enqueue(chunkpos + Vector3.up);
+            }
+        }
+        if (chunks.TryGetValue(chunkpos - Vector3.up, out chunk))
+        {
+            chunk.BuildMesh();
+            foreach (ClientConnection c in clients)
+            {
+                c.chunksToBuild.Enqueue(chunkpos - Vector3.up);
+            }
+        }
+
+        if (chunks.TryGetValue(chunkpos + Vector3.right, out chunk))
+        {
+            chunk.BuildMesh();
+            foreach (ClientConnection c in clients)
+            {
+                c.chunksToBuild.Enqueue(chunkpos + Vector3.right);
+            }
+        }
+        if (chunks.TryGetValue(chunkpos - Vector3.right, out chunk))
+        {
+            chunk.BuildMesh();
+            foreach (ClientConnection c in clients)
+            {
+                c.chunksToBuild.Enqueue(chunkpos - Vector3.right);
+            }
+        }
+    }
+
+    private void UpdateAdjacentChunk(Vector3 blockpos)
+    {
+        Chunk chunk;
+        Vector3 chunkPos;
+
+        if(blockpos.x % Chunk.ChunkSize == 0)
+        {
+            chunkPos = GetChunkIn(blockpos - Vector3.right);
+            if(chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        else if(blockpos.x % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos + Vector3.right);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        
+        if (blockpos.y % Chunk.ChunkSize == 0)
+        {
+            chunkPos = GetChunkIn(blockpos - Vector3.up);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        else if (blockpos.y % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos + Vector3.up);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+
+        if (blockpos.z % Chunk.ChunkSize == 0)
+        {
+            chunkPos = GetChunkIn(blockpos - Vector3.forward);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+        else if (blockpos.z % Chunk.ChunkSize == Chunk.ChunkSize - 1)
+        {
+            chunkPos = GetChunkIn(blockpos + Vector3.forward);
+            if (chunks.TryGetValue(chunkPos, out chunk))
+            {
+                chunk.BuildMesh();
+                if (isServer)
+                {
+                    foreach (ClientConnection client in clients)
+                    {
+                        client.chunksToBuild.Enqueue(chunkPos);
+                    }
+                }
+            }
+        }
+    }
+
     [TargetRpc]
     private void TargetReceiveChunkData(NetworkConnection target, Vector3 pos, int[] blocks)
     {
@@ -150,6 +306,9 @@ public class WorldMaker : NetworkBehaviour
     public int GetBlock(Vector3 pos)
     {
         Vector3 chunkPos = pos / Chunk.ChunkSize;
+        chunkPos.x = Mathf.Floor(chunkPos.x);
+        chunkPos.y = Mathf.Floor(chunkPos.y);
+        chunkPos.z = Mathf.Floor(chunkPos.z);
         Chunk chunk;
         if(chunks.TryGetValue(chunkPos, out chunk))
         {
@@ -160,6 +319,11 @@ public class WorldMaker : NetworkBehaviour
         {
             return -1;
         }
+    }
+
+    public int GetBlock(int x, int y, int z)
+    {
+        return GetBlock(new Vector3(x, y, z));
     }
 
     public void DestroyBlock(Vector3 pos)
@@ -173,10 +337,13 @@ public class WorldMaker : NetworkBehaviour
         {
             chunk = BuildChunk(chunkPos).GetComponent<Chunk>();
         }
-        pos = pos - chunkPos * Chunk.ChunkSize;
-        chunk.DestroyBlock(pos);
-        
-        if(isServer)
+
+        Vector3 posInChunk = pos - chunkPos * Chunk.ChunkSize;
+        chunk.DestroyBlock(posInChunk);
+
+        UpdateAdjacentChunk(pos);
+
+        if (isServer)
         {
             foreach (ClientConnection client in clients)
             {
@@ -228,6 +395,14 @@ public class WorldMaker : NetworkBehaviour
         return new Vector3(0, (worldSize+1) * Chunk.ChunkSize, 0);
     }
 
+    private Vector3 GetChunkIn(Vector3 blockpos)
+    {
+        Vector3 chunkPos = blockpos / Chunk.ChunkSize;
+        chunkPos.x = Mathf.Floor(chunkPos.x);
+        chunkPos.y = Mathf.Floor(chunkPos.y);
+        chunkPos.z = Mathf.Floor(chunkPos.z);
+        return chunkPos;
+    }
 
 
 }
