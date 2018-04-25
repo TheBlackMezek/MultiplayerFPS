@@ -9,6 +9,7 @@ public class ChunkNetManager : NetworkManager {
     public NetworkManagerHUD hud;
     public NetworkDiscovery netDiscovery;
     public InputField connectIP;
+    public Toggle newWorldToggle;
 
     private string serverName;
     private string IPPrefName = "LastUsedIP";
@@ -21,6 +22,7 @@ public class ChunkNetManager : NetworkManager {
         netDiscovery.Initialize();
         netDiscovery.StartAsClient();
         connectIP.text = PlayerPrefs.GetString(IPPrefName);
+        newWorldToggle.onValueChanged.AddListener(SetNewWorldToggle);
     }
 
     public override void OnServerConnect(NetworkConnection conn)
@@ -49,6 +51,9 @@ public class ChunkNetManager : NetworkManager {
         StartClient();
     }
 
-    
+    public void SetNewWorldToggle(bool b)
+    {
+        NetBridge.Instance.makeNewWorld = b;
+    }
 
 }

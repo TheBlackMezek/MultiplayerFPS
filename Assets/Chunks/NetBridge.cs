@@ -29,6 +29,8 @@ public class NetBridge {
     public WorldMaker world;
     public BlockTypeManager blockTypeManager;
 
+    public bool makeNewWorld;
+
     public Color localPlayerColor;
     public string avatarName;
 

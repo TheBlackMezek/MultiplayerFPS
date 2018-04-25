@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class WorldMaker : NetworkBehaviour
 {
@@ -26,6 +28,8 @@ public class WorldMaker : NetworkBehaviour
     private Vector3[] chunksToBuild;
     private int queuedChunk = 0;
 
+    private string savePath = "./Save.chunks";
+
     private List<ClientConnection> clients = new List<ClientConnection>();
 
 
@@ -47,7 +51,10 @@ public class WorldMaker : NetworkBehaviour
             return;
         }
 
-
+        if(!NetBridge.Instance.makeNewWorld)
+        {
+            LoadWorld();
+        }
 
         chunksToBuild = new Vector3[worldSize * worldSize * worldSize];
 
@@ -82,6 +89,16 @@ public class WorldMaker : NetworkBehaviour
         {
             for(int i = 0; i < chunksGennedPerFrame && queuedChunk < chunksToBuild.Length; ++i)
             {
+                while(queuedChunk < chunksToBuild.Length && chunks.TryGetValue(chunksToBuild[queuedChunk], out chunk))
+                {
+                    ++queuedChunk;
+                }
+
+                if(queuedChunk >= chunksToBuild.Length)
+                {
+                    break;
+                }
+
                 chunk = BuildChunk(chunksToBuild[queuedChunk]);
                 generator.BuildChunk(chunk);
                 foreach (ClientConnection c in clients)
@@ -499,5 +516,79 @@ public class WorldMaker : NetworkBehaviour
         return chunkPos;
     }
 
+    private void SaveWorld()
+    {
+        WorldData world;
+        world.data = new ChunkSaveData[chunks.Count];
+
+        int iterator = 0;
+        foreach(KeyValuePair<Vector3, Chunk> chunk in chunks)
+        {
+            world.data[iterator].chunkX = (int)chunk.Key.x;
+            world.data[iterator].chunkY = (int)chunk.Key.y;
+            world.data[iterator].chunkZ = (int)chunk.Key.z;
+            world.data[iterator].blocks = chunk.Value.GetBlockArray();
+            ++iterator;
+        }
+
+        FileStream file;
+
+        if(File.Exists(savePath))
+        {
+            file = File.OpenWrite(savePath);
+        }
+        else
+        {
+            file = File.Create(savePath);
+        }
+
+        BinaryFormatter bf = new BinaryFormatter();
+        bf.Serialize(file, world);
+
+        file.Close();
+    }
+
+    private void OnApplicationQuit()
+    {
+        if(isServer)
+        {
+            SaveWorld();
+        }
+    }
+
+    private void LoadWorld()
+    {
+        FileStream file;
+
+        if(File.Exists(savePath))
+        {
+            file = File.OpenRead(savePath);
+        }
+        else
+        {
+            return;
+        }
+
+        BinaryFormatter bf = new BinaryFormatter();
+        WorldData loaded = (WorldData)bf.Deserialize(file);
+        file.Close();
+
+        foreach(ChunkSaveData chunk in loaded.data)
+        {
+            Vector3 chunkPos = new Vector3(chunk.chunkX, chunk.chunkY, chunk.chunkZ);
+            Chunk script = BuildChunk(chunkPos);
+            script.SetBlocks(chunk.blocks);
+        }
+
+    }
+
 
 }
+
+
+[System.Serializable]
+public struct WorldData
+{
+    public ChunkSaveData[] data;
+}
+

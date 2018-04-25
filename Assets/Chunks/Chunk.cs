@@ -198,3 +198,15 @@ public class Chunk : NetworkBehaviour {
     }
 
 }
+
+
+
+[System.Serializable]
+public struct ChunkSaveData
+{
+    public int chunkX;
+    public int chunkY;
+    public int chunkZ;
+    public int[] blocks;
+}
+
