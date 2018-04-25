@@ -251,7 +251,7 @@ public class MVCController : NetworkBehaviour {
         {
             yvel = 0;
         }
-
+        
         Vector3 move = avatar.up * yvel * input.dt;
         move += avatar.forward * input.moveZ;
         move += avatar.right * input.moveX;
