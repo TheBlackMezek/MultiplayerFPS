@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class ChunkNetManager : NetworkManager {
 
     public NetworkManagerHUD hud;
     public NetworkDiscovery netDiscovery;
+    public InputField connectIP;
 
     private string serverName;
 
@@ -36,6 +38,12 @@ public class ChunkNetManager : NetworkManager {
     {
         serverName = name;
         StartHost();
+    }
+
+    public void JoinGame()
+    {
+        networkAddress = connectIP.text;
+        StartClient();
     }
 
     
