@@ -11,6 +11,7 @@ public class ChunkNetManager : NetworkManager {
     public InputField connectIP;
 
     private string serverName;
+    private string IPPrefName = "LastUsedIP";
 
 
 
@@ -19,6 +20,7 @@ public class ChunkNetManager : NetworkManager {
     {
         netDiscovery.Initialize();
         netDiscovery.StartAsClient();
+        connectIP.text = PlayerPrefs.GetString(IPPrefName);
     }
 
     public override void OnServerConnect(NetworkConnection conn)
@@ -43,6 +45,7 @@ public class ChunkNetManager : NetworkManager {
     public void JoinGame()
     {
         networkAddress = connectIP.text;
+        PlayerPrefs.SetString(IPPrefName, networkAddress);
         StartClient();
     }
 
