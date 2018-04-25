@@ -30,5 +30,6 @@ public class NetBridge {
     public BlockTypeManager blockTypeManager;
 
     public Color localPlayerColor;
+    public string avatarName;
 
 }
