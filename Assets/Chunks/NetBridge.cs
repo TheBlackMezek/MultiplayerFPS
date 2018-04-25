@@ -29,4 +29,6 @@ public class NetBridge {
     public WorldMaker world;
     public BlockTypeManager blockTypeManager;
 
+    public Color localPlayerColor;
+
 }

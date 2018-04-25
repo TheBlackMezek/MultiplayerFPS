@@ -55,11 +55,15 @@ public class MVCController : NetworkBehaviour {
     public AudioListener ls;
     public GameObject playerUI;
     public ChatUIManager chatUIManager;
+    public Renderer renderer;
 
 
     private float yvel = 0;
     private int blockType = 1;
     private int numOfBlockTypes = 3;
+
+    [SyncVar]
+    private Color myColor;
 
     private WorldMaker world;
 
@@ -95,9 +99,12 @@ public class MVCController : NetworkBehaviour {
             cam.enabled = false;
             ls.enabled = false;
             Destroy(playerUI);
+            renderer.material.color = myColor;
         }
         else
         {
+            myColor = NetBridge.Instance.localPlayerColor;
+            CmdSetColor(myColor);
             playerUI.SetActive(true);
             lastVerifiedState.pos = transform.position;
             lastVerifiedState.eulerAvatar = avatar.eulerAngles;
@@ -413,6 +420,20 @@ public class MVCController : NetworkBehaviour {
         {
             yvel = 0;
         }
+    }
+
+    [Command]
+    private void CmdSetColor(Color color)
+    {
+        myColor = color;
+        RpcSetColor(color);
+    }
+
+    [ClientRpc]
+    private void RpcSetColor(Color color)
+    {
+        myColor = color;
+        renderer.material.color = color;
     }
 
 }

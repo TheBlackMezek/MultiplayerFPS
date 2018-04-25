@@ -229,7 +229,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1981326023096712}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 514.4113, y: 10.496147, z: -86.6171}
+  m_LocalPosition: {x: 298.69092, y: -27.46936, z: -86.6171}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4361723706932594}
@@ -794,6 +794,7 @@ MonoBehaviour:
   ls: {fileID: 81940828094692218}
   playerUI: {fileID: 1544283462993024}
   chatUIManager: {fileID: 114797523825297376}
+  renderer: {fileID: 23733222755711868}
 --- !u!124 &124742289908412468
 Behaviour:
   m_ObjectHideFlags: 1

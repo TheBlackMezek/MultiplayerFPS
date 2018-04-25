@@ -178,7 +178,8 @@ public class Chunk : NetworkBehaviour {
     {
         if (pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize
-         && pos.z >= 0 && pos.z < chunkSize)
+         && pos.z >= 0 && pos.z < chunkSize
+         && GetBlock(pos) < 1)
         {
             blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = type;
             BuildMesh();
