@@ -56,6 +56,7 @@ public class MVCController : NetworkBehaviour {
     public GameObject playerUI;
     public ChatUIManager chatUIManager;
     public Renderer renderer;
+    public TextMesh nameTag;
 
 
     private float yvel = 0;
@@ -64,6 +65,8 @@ public class MVCController : NetworkBehaviour {
 
     [SyncVar]
     private Color myColor;
+    [SyncVar]
+    private string charName;
 
     private WorldMaker world;
 
@@ -100,11 +103,14 @@ public class MVCController : NetworkBehaviour {
             ls.enabled = false;
             Destroy(playerUI);
             renderer.material.color = myColor;
+            nameTag.text = charName;
         }
         else
         {
             myColor = NetBridge.Instance.localPlayerColor;
             CmdSetColor(myColor);
+            charName = NetBridge.Instance.avatarName;
+            CmdSetName(charName);
             playerUI.SetActive(true);
             lastVerifiedState.pos = transform.position;
             lastVerifiedState.eulerAvatar = avatar.eulerAngles;
@@ -434,6 +440,20 @@ public class MVCController : NetworkBehaviour {
     {
         myColor = color;
         renderer.material.color = color;
+    }
+
+    [Command]
+    private void CmdSetName(string name)
+    {
+        charName = name;
+        RpcSetName(name);
+    }
+
+    [ClientRpc]
+    private void RpcSetName(string name)
+    {
+        charName = name;
+        nameTag.text = name;
     }
 
 }
