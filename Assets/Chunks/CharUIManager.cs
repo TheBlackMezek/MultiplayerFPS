@@ -12,12 +12,23 @@ public class CharUIManager : MonoBehaviour {
     public InputField charName;
 
     private string charNamePrefName = "LastUsedCharName";
+    private string charColorPrefName = "LastUsedCharColor";
 
 
 
     private void Start()
     {
         charName.text = PlayerPrefs.GetString(charNamePrefName);
+
+        Color color;
+        if (ColorUtility.TryParseHtmlString(PlayerPrefs.GetString(charColorPrefName), out color))
+        {
+            redSlider.value = color.r;
+            greenSlider.value = color.g;
+            blueSlider.value = color.b;
+        }
+        
+
         UpdateExampleColor();
         UpdateCharName();
         if(charName.text == "")
@@ -30,6 +41,7 @@ public class CharUIManager : MonoBehaviour {
     {
         exampleColor.color = new Color(redSlider.value, greenSlider.value, blueSlider.value);
         NetBridge.Instance.localPlayerColor = exampleColor.color;
+        PlayerPrefs.SetString(charColorPrefName, "#" + ColorUtility.ToHtmlStringRGBA(exampleColor.color));
     }
 
     public void UpdateCharName()
