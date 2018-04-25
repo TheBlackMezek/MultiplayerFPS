@@ -11,12 +11,19 @@ public class CharUIManager : MonoBehaviour {
     public Slider blueSlider;
     public InputField charName;
 
+    private string charNamePrefName = "LastUsedCharName";
+
 
 
     private void Start()
     {
+        charName.text = PlayerPrefs.GetString(charNamePrefName);
         UpdateExampleColor();
         UpdateCharName();
+        if(charName.text == "")
+        {
+            charName.text = "Player";
+        }
     }
 
     public void UpdateExampleColor()
@@ -35,6 +42,7 @@ public class CharUIManager : MonoBehaviour {
         {
             NetBridge.Instance.avatarName = charName.text;
         }
+        PlayerPrefs.SetString(charNamePrefName, NetBridge.Instance.avatarName);
     }
 
 }
