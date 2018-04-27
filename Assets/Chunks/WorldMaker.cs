@@ -19,10 +19,15 @@ public class WorldMaker : NetworkBehaviour
     
     public GameObject chunkPrefab;
     
+    [Header("Worldgen")]
     public int worldSize = 3;
     public int chunksGennedPerFrame;
     public int chunksSentPerFrame = 1;
     public WorldGenAbstract generator;
+
+    [Header("Audio")]
+    public ClientObjectPool blockSoundPool;
+    public AudioClip blockSound;
 
     private Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
     private Vector3[] chunksToBuild;
@@ -448,7 +453,13 @@ public class WorldMaker : NetworkBehaviour
         }
 
         Vector3 posInChunk = pos - chunkPos * Chunk.ChunkSize;
-        chunk.DestroyBlock(posInChunk);
+        if(chunk.DestroyBlock(posInChunk))
+        {
+            GameObject soundObj = blockSoundPool.GetObject();
+            soundObj.SetActive(true);
+            soundObj.transform.position = pos;
+            soundObj.GetComponent<BlockSound>().PlaySound(blockSound);
+        }
 
         UpdateAdjacentChunk(pos);
 
@@ -489,7 +500,13 @@ public class WorldMaker : NetworkBehaviour
             chunk = BuildChunk(chunkPos);
         }
         Vector3 posInChunk = pos - chunkPos * Chunk.ChunkSize;
-        chunk.AddBlock(posInChunk, type);
+        if (chunk.AddBlock(posInChunk, type))
+        {
+            GameObject soundObj = blockSoundPool.GetObject();
+            soundObj.SetActive(true);
+            soundObj.transform.position = pos;
+            soundObj.GetComponent<BlockSound>().PlaySound(blockSound);
+        }
 
         UpdateAdjacentChunk(pos);
 

@@ -114,6 +114,48 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &442315388
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 442315390}
+  - component: {fileID: 442315389}
+  m_Layer: 0
+  m_Name: BlockSoundPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &442315389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 442315388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0825ad2a636e9b4f8c8f3f287d31e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 1579394009276102, guid: 31e24c5621ca31240a461ef0766bc23f, type: 2}
+  initialPoolSize: 10
+--- !u!4 &442315390
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 442315388}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 24.64282, y: 37.913273, z: 17.762314}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1064580566
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,6 +370,8 @@ MonoBehaviour:
   chunksGennedPerFrame: 5
   chunksSentPerFrame: 1
   generator: {fileID: 11400000, guid: 0988b6254320f9f4eb41aca4812072e6, type: 2}
+  blockSoundPool: {fileID: 442315389}
+  blockSound: {fileID: 8300000, guid: 6bbed5c7739554a4d8fc268973c41762, type: 3}
 --- !u!114 &1522753158
 MonoBehaviour:
   m_ObjectHideFlags: 0

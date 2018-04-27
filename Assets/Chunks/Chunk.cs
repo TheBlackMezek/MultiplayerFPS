@@ -162,7 +162,7 @@ public class Chunk : NetworkBehaviour {
         return blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize];
     }
 
-    public void DestroyBlock(Vector3 pos)
+    public bool DestroyBlock(Vector3 pos)
     {
         if (pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize
@@ -171,10 +171,12 @@ public class Chunk : NetworkBehaviour {
         {
             blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = 0;
             BuildMesh();
+            return true;
         }
+        return false;
     }
 
-    public void AddBlock(Vector3 pos, int type)
+    public bool AddBlock(Vector3 pos, int type)
     {
         if (pos.x >= 0 && pos.x < chunkSize
          && pos.y >= 0 && pos.y < chunkSize
@@ -183,7 +185,9 @@ public class Chunk : NetworkBehaviour {
         {
             blocks[(int)pos.x + (int)pos.y * chunkSize + (int)pos.z * chunkSize * chunkSize] = type;
             BuildMesh();
+            return true;
         }
+        return false;
     }
 
     public void SetBlocks(int[] b)
